@@ -2,6 +2,9 @@ import os, sys
 import pygame
 from pygame.locals import *
 
+from planet import *
+from colony import *
+
 if not pygame.font: print('Warning, fonts disabled')
 if not pygame.mixer: print('Warning, sound disabled')
 	
@@ -26,6 +29,17 @@ def main():
     # Blit everything to the screen
     screen.blit(background, (0, 0))
     pygame.display.flip()
+    
+    p = Planet([],2,250,0.1)
+    c = Colony(p)
+    print(c)
+    c.build(BuildMine())
+    c.build(BuildMine())
+    
+    for i in range(1,50):
+        c.update()
+        c.build(BuildDrone())
+        print(c)
     
     # Event loop
     while 1:
