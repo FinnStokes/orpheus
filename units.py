@@ -66,7 +66,7 @@ class Ship(Unit):
         if self._colony.metal < amount:
             print("Unble to load Metal: not enough metal available")
             return
-        if amount > self._capacity:
+        if amount > self._capacity*100:
             print("Unble to load Metal: over capacity")
             return
         self._payloadType = "Metal"
@@ -80,7 +80,7 @@ class Ship(Unit):
         if self._colony.food < amount:
             print("Unble to load Food: not enough food available")
             return
-        if amount > self._capacity:
+        if amount > self._capacity*100:
             print("Unble to load Food: over capacity")
             return
         self._payloadType = "Food"
@@ -94,7 +94,7 @@ class Ship(Unit):
         if self._colony.fuel < amount:
             print("Unble to load Fuel: not enough fuel available")
             return
-        if amount > self._capacity:
+        if amount > self._capacity*100:
             print("Unble to load Fuel: over capacity")
             return
         self._payloadType = "Fuel"

@@ -30,10 +30,10 @@ def main():
     # screen.blit(background, (0, 0))
     # pygame.display.flip()
     
-    p1 = Planet(2,5,0.1)
-    p2 = Planet(10,0,0.5)
-    p1.addLink(p2,0.5)
-    p2.addLink(p1,0.1)
+    p1 = Planet(2,500,10)
+    p2 = Planet(10,0,50)
+    p1.addLink(p2,50)
+    p2.addLink(p1,10)
     
     c1 = Colony(p1)
     c2 = Colony(p2)

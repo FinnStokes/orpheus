@@ -19,9 +19,9 @@ class Colony:
             b.update()
         for u in self._units:
             u.update()
-        if self.planet.fuel >= 0.05:
-            self.planet.fuel -= 0.05
-            self.fuel += 0.05
+        if self.planet.fuel >= 1:
+            self.planet.fuel -= 1
+            self.fuel += 1
         if len(self.queue) > 0:
             project = self.queue[0]
             done = project.work(self.production(), self)
@@ -70,7 +70,7 @@ class Project:
             print("Project cancelled: Insufficient resources")
             return True
         self.ergs -= ergs
-        if self.ergs < 0:
+        if self.ergs <= 0:
             print("Project complete")
             self.done(colony)
             return True
@@ -87,7 +87,7 @@ class BuildMine(Project):
         Project.__init__(self, 10)
     
     def okay(self, colony):
-        return colony.planet.metal > 0
+        return colony.planet.metal >= 1
     
     def done(self, colony):
         if self.okay(colony):
