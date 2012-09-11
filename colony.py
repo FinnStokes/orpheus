@@ -6,9 +6,9 @@ class Colony:
         if not planet.colony:
             self.planet = planet
             planet.colony = self
-        self._metal = 0
-        self._fuel = 0
-        self._food = 0
+        self.metal = 0
+        self.fuel = 0
+        self.food = 0
         self._production = 1
         self.queue = deque([])
         self._buildings = []
@@ -21,21 +21,12 @@ class Colony:
             u.update()
         if self.planet.fuel >= 0.05:
             self.planet.fuel -= 0.05
-            self._fuel += 0.05
+            self.fuel += 0.05
         if len(self.queue) > 0:
             project = self.queue[0]
             done = project.work(self.production(), self)
             if done:
                 self.queue.popleft()
-    
-    def metal(self):
-        return self._metal
-    
-    def fuel(self):
-        return self._fuel
-    
-    def food(self):
-        return self._food
     
     def production(self):
         ergs = self._production
@@ -67,8 +58,8 @@ class Colony:
     def costTo(self, planet):
         return self.planet.links[planet]
     
-    def __str__(self):
-        return "Colony(mt=%i, fl=%i, fd=%i, pr=%i)"%(self.metal(),self.fuel(),self.food(),self.production())
+    def __repr__(self):
+        return "Colony(mt=%f, fl=%f, fd=%f, pr=%f)"%(self.metal,self.fuel,self.food,self.production())
 
 class Project:
     def __init__(self, ergs):
@@ -101,18 +92,18 @@ class BuildMine(Project):
     def done(self, colony):
         if self.okay(colony):
             colony.planet.metal -= 1
-            colony._metal += 1
+            colony.metal += 1
 
 class BuildDrone(Project):
     def __init__(self):
         Project.__init__(self, 10)
     
     def okay(self, colony):
-        return colony._metal >= 1
+        return colony.metal >= 1
     
     def done(self, colony):
         if self.okay(colony):
-            colony._metal -= 1
+            colony.metal -= 1
             colony.addUnit(units.Drone(colony, 1))
 
 class BuildShip(Project):
@@ -120,9 +111,9 @@ class BuildShip(Project):
         Project.__init__(self, 10)
     
     def okay(self, colony):
-        return colony._metal >= 1
+        return colony.metal >= 1
     
     def done(self, colony):
         if self.okay(colony):
-            colony._metal -= 1
+            colony.metal -= 1
             colony.addUnit(units.Ship(colony, 1))

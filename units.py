@@ -37,11 +37,11 @@ class Ship(Unit):
             self._colony = self._destination.colony
             self._destination = None
             if self._payloadType == "Metal":
-                self._colony._metal += self._payload
+                self._colony.metal += self._payload
             elif self._payloadType == "Food":
-                self._colony._food += self._payload
+                self._colony.food += self._payload
             elif self._payloadType == "Fuel":
-                self._colony._fuel += self._payload
+                self._colony.fuel += self._payload
             elif self._payloadType == "Units":
                 for u in self._payload:
                     self._colony.addUnit(u)
@@ -50,8 +50,8 @@ class Ship(Unit):
 
     def go(self, dest):
         fuelCost = self._colony.costTo(dest)*(self._capacity+1)
-        if self._colony._fuel >= fuelCost - self._fuel:
-            self._colony._fuel -= fuelCost - self._fuel
+        if self._colony.fuel >= fuelCost - self._fuel:
+            self._colony.fuel -= fuelCost - self._fuel
             self._fuel = fuelCost
             self._destination = dest
             return True
@@ -63,7 +63,7 @@ class Ship(Unit):
         if self._payloadType:
             print("Unble to load Metal: %s already loaded"%self._payloadType)
             return
-        if self._colony._metal < amount:
+        if self._colony.metal < amount:
             print("Unble to load Metal: not enough metal available")
             return
         if amount > self._capacity:
@@ -71,13 +71,13 @@ class Ship(Unit):
             return
         self._payloadType = "Metal"
         self._payload = amount
-        self._colony._metal -= amount
+        self._colony.metal -= amount
 
     def loadFood(self, amount):
         if self._payloadType:
             print("Unble to load Food: %s already loaded"%self._payloadType)
             return
-        if self._colony._food < amount:
+        if self._colony.food < amount:
             print("Unble to load Food: not enough food available")
             return
         if amount > self._capacity:
@@ -85,13 +85,13 @@ class Ship(Unit):
             return
         self._payloadType = "Food"
         self._payload = amount
-        self._colony._food -= amount
+        self._colony.food -= amount
 
     def loadFuel(self, amount):
         if self._payloadType:
             print("Unble to load Fuel: %s already loaded"%self._payloadType)
             return
-        if self._colony._fuel < amount:
+        if self._colony.fuel < amount:
             print("Unble to load Fuel: not enough fuel available")
             return
         if amount > self._capacity:
@@ -99,7 +99,7 @@ class Ship(Unit):
             return
         self._payloadType = "Fuel"
         self._payload = amount
-        self._colony._fuel -= amount
+        self._colony.fuel -= amount
         
     def loadUnit(self, unit):
         if self._payloadType and self._payloadType != "Unit":
@@ -119,4 +119,3 @@ class Ship(Unit):
             return
         self._payload.append(unit)
         self._colony.removeUnit(unit)
-            
