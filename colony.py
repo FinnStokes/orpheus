@@ -16,9 +16,12 @@ class Colony:
     
     def update(self):
         for b in self._buildings:
-            b.update(self)
+            b.update()
         for u in self._units:
-            u.update(self)
+            u.update()
+        if self.planet.fuel >= 0.05:
+            self.planet.fuel -= 0.05
+            self._fuel += 0.05
         if len(self.queue) > 0:
             project = self.queue[0]
             done = project.work(self.production(), self)
@@ -37,9 +40,9 @@ class Colony:
     def production(self):
         ergs = self._production
         for b in self._buildings:
-            ergs += b.production(self)
+            ergs += b.production()
         for u in self._units:
-            ergs += u.production(self)
+            ergs += u.production()
         return ergs
 
     def build(self, project):
@@ -48,6 +51,21 @@ class Colony:
             self.queue.append(project)
             return True
         return False
+    
+    def addUnit(self, unit):
+        self._units.append(unit)
+
+    def getUnit(self, i):
+        return self._units[i]
+
+    def hasUnit(self, unit):
+        return unit in self._units
+    
+    def removeUnit(self, unit):
+        self._units.remove(unit)
+    
+    def costTo(self, planet):
+        return self.planet.links[planet]
     
     def __str__(self):
         return "Colony(mt=%i, fl=%i, fd=%i, pr=%i)"%(self.metal(),self.fuel(),self.food(),self.production())
@@ -58,9 +76,11 @@ class Project:
     
     def work(self, ergs, colony):
         if not self.okay(colony):
+            print("Project cancelled: Insufficient resources")
             return True
         self.ergs -= ergs
         if self.ergs < 0:
+            print("Project complete")
             self.done(colony)
             return True
         return False
@@ -93,4 +113,16 @@ class BuildDrone(Project):
     def done(self, colony):
         if self.okay(colony):
             colony._metal -= 1
-            colony._units.append(units.Drone(1))
+            colony.addUnit(units.Drone(colony, 1))
+
+class BuildShip(Project):
+    def __init__(self):
+        Project.__init__(self, 10)
+    
+    def okay(self, colony):
+        return colony._metal >= 1
+    
+    def done(self, colony):
+        if self.okay(colony):
+            colony._metal -= 1
+            colony.addUnit(units.Ship(colony, 1))
