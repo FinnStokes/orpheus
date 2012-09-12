@@ -1,4 +1,15 @@
+def units():
+    for (name, o) in globals().iteritems():
+        try:
+            if (o != Unit) and issubclass(o, Unit):
+                yield name, o
+        except TypeError: pass
+
 class Unit:
+    ergCost = 10
+    metalCost = 0
+    foodCost = 0
+    fuelCost = 0
     def __init__(self, colony):
         self._colony = colony
     
@@ -12,17 +23,18 @@ class Unit:
         return True
 
 class Drone(Unit):
-    def __init__(self, colony, ergs):
-        Unit.__init__(self, colony)
-        self._ergs = ergs
+    metalCost = 1
+    ergRate = 1
     
     def production(self):
-        return self._ergs
+        return Drone.ergRate
 
 class Ship(Unit):
-    def __init__(self, colony, capacity):
+    metalCost = 1
+    capacity = 1
+    
+    def __init__(self, colony):
         Unit.__init__(self, colony)
-        self._capacity = capacity
         self._payloadType = ""
         self._payload = None
         self._destination = None
@@ -56,7 +68,7 @@ class Ship(Unit):
         self._payload = None
     
     def go(self, dest):
-        fuelCost = self._colony.costTo(dest)*(self._capacity+1)
+        fuelCost = self._colony.costTo(dest)*(Ship.capacity+1)
         if self._colony.fuel >= fuelCost - self._fuel:
             self._colony.fuel -= fuelCost - self._fuel
             self._fuel = fuelCost
@@ -71,8 +83,8 @@ class Ship(Unit):
             self.unload()
         if amount > self._colony.metal:
             amount = self._colony.metal
-        if amount > self._capacity:
-            amount = self._capacity
+        if amount > Ship.capacity:
+            amount = Ship.capacity
         self._payloadType = "Metal"
         self._payload = amount
         self._colony.metal -= amount
@@ -82,8 +94,8 @@ class Ship(Unit):
             self.unload()
         if amount > self._colony.food:
             amount = self._colony.food
-        if amount > self._capacity*100:
-            amount = self._capacity*100
+        if amount > Ship.capacity*100:
+            amount = Ship.capacity*100
         self._payloadType = "Food"
         self._payload = amount
         self._colony.food -= amount
@@ -93,8 +105,8 @@ class Ship(Unit):
             self.unload()
         if amount > self._colony.fuel:
             amount = self._colony.fuel
-        if amount > self._capacity*100:
-            amount = self._capacity*100
+        if amount > Ship.capacity*100:
+            amount = Ship.capacity*100
         self._payloadType = "Fuel"
         self._payload = amount
         self._colony.fuel -= amount
@@ -111,7 +123,7 @@ class Ship(Unit):
         if not self._payloadType:
             self._payloadType = "Units"
             self._payload = []
-        if len(self._payload) >= self._capacity:
+        if len(self._payload) >= Ship.capacity:
             print("Unble to load Unit: over capacity")
             return
         self._payload.append(unit)

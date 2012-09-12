@@ -1,5 +1,4 @@
 from collections import deque
-import units, buildings
 
 class Colony:
     def __init__(self, planet):
@@ -104,36 +103,36 @@ class BuildMine(Project):
             colony.planet.metal -= 1
             colony.metal += 1
 
-class BuildFuel(Project):
-    def __init__(self):
-        Project.__init__(self, 10)
+class BuildUnit(Project):
+    def __init__(self, unit):
+        Project.__init__(self, unit.ergCost)
+        self.unit = unit
     
     def okay(self, colony):
-        return True
-    
-    def done(self, colony):
-        colony._buildings.append(buildings.FuelExtractor(colony))
-
-class BuildDrone(Project):
-    def __init__(self):
-        Project.__init__(self, 10)
-    
-    def okay(self, colony):
-        return colony.metal >= 1
+        return (colony.metal >= self.unit.metalCost and
+                colony.fuel >= self.unit.fuelCost and
+                colony.food >= self.unit.foodCost)
     
     def done(self, colony):
         if self.okay(colony):
-            colony.metal -= 1
-            colony.addUnit(units.Drone(colony, 1))
+            colony.metal -= self.unit.metalCost
+            colony.fuel -= self.unit.fuelCost
+            colony.food -= self.unit.foodCost
+            colony.addUnit(self.unit(colony))
 
-class BuildShip(Project):
-    def __init__(self):
-        Project.__init__(self, 10)
+class BuildBuilding(Project):
+    def __init__(self, building):
+        Project.__init__(self, building.ergCost)
+        self.building = building
     
     def okay(self, colony):
-        return colony.metal >= 1
+        return (colony.metal >= self.building.metalCost and
+                colony.fuel >= self.building.fuelCost and
+                colony.food >= self.building.foodCost)
     
     def done(self, colony):
         if self.okay(colony):
-            colony.metal -= 1
-            colony.addUnit(units.Ship(colony, 1))
+            colony.metal -= self.building.metalCost
+            colony.fuel -= self.building.fuelCost
+            colony.food -= self.building.foodCost
+            colony._buildings.append(self.building(colony))

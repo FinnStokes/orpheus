@@ -1,4 +1,15 @@
+def buildings():
+    for (name, o) in globals().iteritems():
+        try:
+            if (o != Building) and issubclass(o, Building):
+                yield name, o
+        except TypeError: pass
+
 class Building:
+    ergCost = 10
+    metalCost = 0
+    foodCost = 0
+    fuelCost = 0
     def __init__(self, colony):
         self.colony = colony
     
@@ -6,10 +17,12 @@ class Building:
         processed.append(self)
 
 class Manufactory(Building):
+    metalCost = 2
     def construct(self, unit):
         pass
 
 class ReclamationFacility(Building):
+    metalCost = 1
     def reclaim(self, unit):
         pass
 
