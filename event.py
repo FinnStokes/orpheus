@@ -36,12 +36,11 @@ class EventManage:
 # update(dt)
 # Called periodically with dt set to the time in seconds it was last produced
 
-# keypress(keyid)
+# key_down(keyid)
 # Called when a key is pressed, keyid to be interpreted by pygame.locals 
 
-# keyrelease(keyid)
+# key_up(keyid)
 # Called when a key is released, keyid to be interpreted by pygame.locals 
-
 
 # resourceupdate(resourceid, amount)
 # Update available amount of a resource, for reflection in interface
@@ -61,18 +60,17 @@ class EventManage:
 # upgradeship(colony, ship, upgrade)
 # make an improvement to a ship via the as yet only suggested Astronautics Division building
 
-
-# transport(ship, source, dest)
+# transport(ship, dest)
 # 
-
 
 # queueproject(projectid, colony)
 # 
 
 # completeproject(projectid, colony)
-#
+# notification that a project has been successfully completed
 
 #
 #
+
 
 
