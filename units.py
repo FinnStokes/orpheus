@@ -2,8 +2,8 @@ class Unit:
     def __init__(self, colony):
         self._colony = colony
     
-    def update(self):
-        pass
+    def update(self, processed):
+        processed.append(self)
     
     def production(self):
         return 0
@@ -31,7 +31,7 @@ class Ship(Unit):
     def transportable(self):
         return False
     
-    def update(self):
+    def update(self, processed):
         if self._destination:
             self._fuel = 0
             self._colony.removeUnit(self)
@@ -40,6 +40,7 @@ class Ship(Unit):
             self._destination = None
             if self._payloadType:
                 self.unload()
+        Unit.update(self, processed)
     
     def unload(self):
         if self._payloadType == "Metal":

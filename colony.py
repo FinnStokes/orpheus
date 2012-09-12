@@ -1,5 +1,5 @@
 from collections import deque
-import units
+import units, buildings
 
 class Colony:
     def __init__(self, planet):
@@ -17,13 +17,12 @@ class Colony:
         self._delUnits = []
     
     def update(self):
+        processed = []
         for b in self._buildings:
-            b.update()
+            b.update(processed)
+        processed = []
         for u in self.units():
-            u.update()
-        if self.planet.fuel >= 1:
-            self.planet.fuel -= 1
-            self.fuel += 1
+            u.update(processed)
         if len(self.queue) > 0:
             project = self.queue[0]
             done = project.work(self.production(), self)
@@ -92,7 +91,7 @@ class Project:
     
     def done(self, colony):
         pass
-    
+
 class BuildMine(Project):
     def __init__(self):
         Project.__init__(self, 10)
@@ -104,6 +103,16 @@ class BuildMine(Project):
         if self.okay(colony):
             colony.planet.metal -= 1
             colony.metal += 1
+
+class BuildFuel(Project):
+    def __init__(self):
+        Project.__init__(self, 10)
+    
+    def okay(self, colony):
+        return True
+    
+    def done(self, colony):
+        colony._buildings.append(buildings.FuelExtractor(colony))
 
 class BuildDrone(Project):
     def __init__(self):

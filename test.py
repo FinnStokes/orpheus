@@ -3,10 +3,12 @@ import planet
 import colony
 import units
 import buildings
+import math
 
 class TestColony(unittest.TestCase):
     def setUp(self):
-        self.fuelRate = 1
+        self.fuelRate = 10
+        self.fuelTime = 10
         self.mineTime = 10
         self.droneTime = 10
         self.p1 = planet.Planet(5,0,0)
@@ -28,59 +30,53 @@ class TestColony(unittest.TestCase):
             }
     
     def update(self, turns):
-        for i in range(0,turns):
+        for i in range(0,math.ceil(turns)):
             self.c1.update()
             self.c2.update()
             self.c3.update()
     
-    def assertResources(self, colony, metal, fuel, food):
-        self.assertEqual(colony.metal, metal)
-        self.assertEqual(colony.fuel, fuel)
-        self.assertEqual(colony.food, food)
-
-    def assertResourceConservation(self, colony):
-        self.assertEqual(colony.metal + colony.planet.metal, self.initial[colony]['metal'])
-        self.assertEqual(colony.fuel + colony.planet.fuel, self.initial[colony]['fuel'])
-        self.assertEqual(colony.food + colony.planet.food, self.initial[colony]['food'])
-    
     def test_fuel(self):
+        self.c1.build(colony.BuildFuel())
+        self.c2.build(colony.BuildFuel())
+        self.c3.build(colony.BuildFuel())
+        self.update(self.fuelTime)
         self.update(20)
-        self.assertResources(self.c1,0,0,0)
-        self.assertResourceConservation(self.c1)
-        self.assertResources(self.c2,0,20*self.fuelRate,0)
-        self.assertResourceConservation(self.c2)
-        self.assertResources(self.c3,0,0,0)
-        self.assertResourceConservation(self.c3)
+        self.assertEqual(self.c1.fuel, 0)
+        self.assertEqual(self.c1.fuel + self.c1.planet.fuel, self.initial[self.c1]['fuel'])
+        self.assertEqual(self.c2.fuel, 20*self.fuelRate)
+        self.assertEqual(self.c2.fuel + self.c2.planet.fuel, self.initial[self.c2]['fuel'])
+        self.assertEqual(self.c3.fuel, 0)
+        self.assertEqual(self.c3.fuel + self.c3.planet.fuel, self.initial[self.c3]['fuel'])
         self.update(500/self.fuelRate)
-        self.assertResources(self.c1,0,0,0)
-        self.assertResourceConservation(self.c1)
-        self.assertResources(self.c2,0,500,0)
-        self.assertResourceConservation(self.c2)
-        self.assertResources(self.c3,0,0,0)
-        self.assertResourceConservation(self.c3)
+        self.assertEqual(self.c1.fuel, 0)
+        self.assertEqual(self.c1.fuel + self.c1.planet.fuel, self.initial[self.c1]['fuel'])
+        self.assertEqual(self.c2.fuel, 500)
+        self.assertEqual(self.c2.fuel + self.c2.planet.fuel, self.initial[self.c2]['fuel'])
+        self.assertEqual(self.c3.fuel, 0)
+        self.assertEqual(self.c3.fuel + self.c3.planet.fuel, self.initial[self.c3]['fuel'])
 
     def test_metal(self):
         self.c1.build(colony.BuildMine())
         self.c2.build(colony.BuildMine())
         self.c3.build(colony.BuildMine())
         self.update(self.mineTime)
-        self.assertResources(self.c1,1,0,0)
-        self.assertResourceConservation(self.c1)
-        self.assertResources(self.c2,0,self.mineTime,0)
-        self.assertResourceConservation(self.c2)
-        self.assertResources(self.c3,0,0,0)
-        self.assertResourceConservation(self.c3)
+        self.assertEqual(self.c1.metal, 1)
+        self.assertEqual(self.c1.metal + self.c1.planet.metal, self.initial[self.c1]['metal'])
+        self.assertEqual(self.c2.metal, 0)
+        self.assertEqual(self.c2.metal + self.c2.planet.metal, self.initial[self.c2]['metal'])
+        self.assertEqual(self.c3.metal, 0)
+        self.assertEqual(self.c3.metal + self.c3.planet.metal, self.initial[self.c3]['metal'])
         for i in range(0,5):
             self.c1.build(colony.BuildMine())
             self.c2.build(colony.BuildMine())
             self.c3.build(colony.BuildMine())
         self.update(5*self.mineTime)
-        self.assertResources(self.c1,5,0,0)
-        self.assertResourceConservation(self.c1)
-        self.assertResources(self.c2,0,6*self.mineTime,0)
-        self.assertResourceConservation(self.c2)
-        self.assertResources(self.c3,0,0,0)
-        self.assertResourceConservation(self.c3)
+        self.assertEqual(self.c1.metal, 5)
+        self.assertEqual(self.c1.metal + self.c1.planet.metal, self.initial[self.c1]['metal'])
+        self.assertEqual(self.c2.metal, 0)
+        self.assertEqual(self.c2.metal + self.c2.planet.metal, self.initial[self.c2]['metal'])
+        self.assertEqual(self.c3.metal, 0)
+        self.assertEqual(self.c3.metal + self.c3.planet.metal, self.initial[self.c3]['metal'])
     
     def test_drone(self):
         self.c1.build(colony.BuildMine())
