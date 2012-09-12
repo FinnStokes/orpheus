@@ -13,11 +13,13 @@ class Colony:
         self.queue = deque([])
         self._buildings = []
         self._units = []
+        self._addUnits = []
+        self._delUnits = []
     
     def update(self):
         for b in self._buildings:
             b.update()
-        for u in self._units:
+        for u in self.units():
             u.update()
         if self.planet.fuel >= 1:
             self.planet.fuel -= 1
@@ -32,7 +34,7 @@ class Colony:
         ergs = self._production
         for b in self._buildings:
             ergs += b.production()
-        for u in self._units:
+        for u in self.units():
             ergs += u.production()
         return ergs
 
@@ -42,18 +44,27 @@ class Colony:
             self.queue.append(project)
             return True
         return False
-    
-    def addUnit(self, unit):
-        self._units.append(unit)
 
+    def units(self):
+        for a in self._addUnits:
+            self._units.append(a)
+        self._addUnits = []
+        for d in self._delUnits:
+            self._units.remove(d)
+        self._delUnits = []
+        return self._units
+    
     def getUnit(self, i):
-        return self._units[i]
+        return self.units()[i]
+
+    def addUnit(self, unit):
+        self._addUnits.append(unit)
 
     def hasUnit(self, unit):
-        return unit in self._units
+        return unit in self.units()
     
     def removeUnit(self, unit):
-        self._units.remove(unit)
+        self._delUnits.append(unit)
     
     def costTo(self, planet):
         return self.planet.links[planet]
