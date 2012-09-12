@@ -43,6 +43,13 @@ class Colony:
             return True
         return False
 
+    def getBuildings(self, building):
+        ret = []
+        for b in self._buildings:
+            if isinstance(b,building):
+                ret.append(b)
+        return ret
+
     def units(self):
         for a in self._addUnits:
             self._units.append(a)

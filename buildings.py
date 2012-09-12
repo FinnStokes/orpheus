@@ -1,3 +1,5 @@
+from collections import deque
+
 def buildings():
     for (name, o) in globals().iteritems():
         try:
@@ -15,16 +17,54 @@ class Building:
     
     def update(self, processed):
         processed.append(self)
+    
+    def production(self):
+        return 0
 
 class Manufactory(Building):
     metalCost = 2
+    ergRate = 1
+    
+    def __init__(self, colony):
+        Building.__init__(self, colony)
+        self.ergs = 0
+        self._queue = deque([])
+    
     def construct(self, unit):
-        pass
+        if self.okay(unit):
+            self._queue.append(unit)
+    
+    def update(self, processed):
+        if len(self._queue) > 0:
+            self.ergs += self.ergRate
+            while len(self._queue) > 0 and (not self.okay(self._queue[0]) or self.ergs >= self._queue[0].ergCost):
+                self.done(self._queue.popleft())
+        else:
+            self.ergs = 0
+        Building.update(self, processed)
+
+    def okay(self, unit):
+        return (self.colony.metal >= unit.metalCost and
+                self.colony.fuel >= unit.fuelCost and
+                self.colony.food >= unit.foodCost)
+    
+    def done(self, unit):
+        if self.okay(unit):
+            self.ergs -= unit.ergCost
+            self.colony.metal -= unit.metalCost
+            self.colony.fuel -= unit.fuelCost
+            self.colony.food -= unit.foodCost
+            self.colony.addUnit(unit(self.colony))
+    
 
 class ReclamationFacility(Building):
     metalCost = 1
     def reclaim(self, unit):
-        pass
+        if not self.colony.hasUnit(unit):
+            print("Unable to reclaim unit: unit not present")
+            return
+        self.colony.removeUnit(unit)
+        self.colony.metal += unit.metalCost
 
 class FuelExtractor(Building):
     def update(self, processed):
