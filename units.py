@@ -68,7 +68,7 @@ class Ship(Unit):
         self._payload = None
     
     def go(self, dest):
-        fuelCost = self._colony.costTo(dest)*(Ship.capacity+1)
+        fuelCost = self._colony.costTo(dest)*(self.capacity+1)
         if self._colony.fuel >= fuelCost - self._fuel:
             self._colony.fuel -= fuelCost - self._fuel
             self._fuel = fuelCost
@@ -83,8 +83,8 @@ class Ship(Unit):
             self.unload()
         if amount > self._colony.metal:
             amount = self._colony.metal
-        if amount > Ship.capacity:
-            amount = Ship.capacity
+        if amount > self.capacity:
+            amount = self.capacity
         self._payloadType = "Metal"
         self._payload = amount
         self._colony.metal -= amount
@@ -94,8 +94,8 @@ class Ship(Unit):
             self.unload()
         if amount > self._colony.food:
             amount = self._colony.food
-        if amount > Ship.capacity*100:
-            amount = Ship.capacity*100
+        if amount > self.capacity*100:
+            amount = self.capacity*100
         self._payloadType = "Food"
         self._payload = amount
         self._colony.food -= amount
@@ -105,8 +105,8 @@ class Ship(Unit):
             self.unload()
         if amount > self._colony.fuel:
             amount = self._colony.fuel
-        if amount > Ship.capacity*100:
-            amount = Ship.capacity*100
+        if amount > self.capacity*100:
+            amount = self.capacity*100
         self._payloadType = "Fuel"
         self._payload = amount
         self._colony.fuel -= amount
@@ -123,7 +123,7 @@ class Ship(Unit):
         if not self._payloadType:
             self._payloadType = "Units"
             self._payload = []
-        if len(self._payload) >= Ship.capacity:
+        if len(self._payload) >= self.capacity:
             print("Unble to load Unit: over capacity")
             return
         self._payload.append(unit)
