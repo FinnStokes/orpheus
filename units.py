@@ -29,14 +29,11 @@ class Drone(Unit):
     def production(self):
         return Drone.ergRate
 
-class Transport(Unit):
-    metalCost = 1
-    capacity = 1
+class Ship(Unit):
+    fuelFactor = 1
     
     def __init__(self, colony):
         Unit.__init__(self, colony)
-        self._payloadType = ""
-        self._payload = None
         self._destination = None
         self._fuel = 0
     
@@ -50,9 +47,33 @@ class Transport(Unit):
             self._colony = self._destination.colony
             self._colony.addUnit(self)
             self._destination = None
-            if self._payloadType:
-                self.unload()
         Unit.update(self, processed)
+    
+    def go(self, dest):
+        fuelCost = self._colony.costTo(dest)*self.fuelFactor
+        if self._colony.fuel >= fuelCost - self._fuel:
+            self._colony.fuel -= fuelCost - self._fuel
+            self._fuel = fuelCost
+            self._destination = dest
+            return True
+        else:
+            print("Not enough fuel for trip")
+            return False
+
+class Transport(Ship):
+    metalCost = 1
+    capacity = 1
+    
+    def __init__(self, colony):
+        Ship.__init__(self, colony)
+        self._payloadType = ""
+        self._payload = None
+        self.fuelFactor = self.capacity+1
+    
+    def update(self, processed):
+        Ship.update(self, processed)
+        if self._payloadType:
+            self.unload()
     
     def unload(self):
         if self._payloadType == "Metal":
@@ -66,17 +87,6 @@ class Transport(Unit):
                 self._colony.addUnit(u)
         self._payloadType = ""
         self._payload = None
-    
-    def go(self, dest):
-        fuelCost = self._colony.costTo(dest)*(self.capacity+1)
-        if self._colony.fuel >= fuelCost - self._fuel:
-            self._colony.fuel -= fuelCost - self._fuel
-            self._fuel = fuelCost
-            self._destination = dest
-            return True
-        else:
-            print("Not enough fuel for trip")
-            return False
     
     def loadMetal(self, amount):
         if self._payloadType:

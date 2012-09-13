@@ -32,7 +32,7 @@ class TestColony(unittest.TestCase):
             }
     
     def update(self, turns):
-        for i in range(0,math.ceil(turns)):
+        for i in range(0,int(math.ceil(turns))):
             self.c1.update()
             self.c2.update()
             self.c3.update()
@@ -184,7 +184,7 @@ class TestTransport(unittest.TestCase):
         self.p3.addLink(self.p2,10/2)
     
     def update(self, turns):
-        for i in range(0,turns):
+        for i in range(0,int(math.ceil(turns))):
             self.c1.update()
             self.c2.update()
             self.c3.update()
@@ -245,10 +245,11 @@ class TestTransport(unittest.TestCase):
         self.assertTrue(self.c3.hasUnit(s1))
         self.assertTrue(self.c3.hasUnit(s2))
         self.assertTrue(self.c1.hasUnit(s3))
-        self.assertResources(self.c1,0,20,0)
+        self.assertResources(self.c1,0,20,50)
         self.assertResources(self.c2,0,120,100)
         self.assertResources(self.c3,3,20,0)
         
+        s3.loadFood(100)
         s3.go(self.p3)
         m3.construct(units.Drone)
         m3.construct(units.Drone)
