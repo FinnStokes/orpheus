@@ -1,3 +1,5 @@
+from colony import Colony
+
 def units():
     for (name, o) in globals().iteritems():
         try:
@@ -138,3 +140,20 @@ class Transport(Ship):
             return
         self._payload.append(unit)
         self._colony.removeUnit(unit)
+
+class Settler(Ship):
+    metalCost = 2
+    fuelFactor = 4
+    
+    def update(self, processed):
+        if self._destination and not self._destination.colony:
+            newColony = Colony(self._destination)
+            self._fuel = 0
+            self._destination = None
+            self._colony.removeUnit(self)
+        else:
+            Ship.update(self, processed)
+
+class Scout(Ship):
+    metalCost = 1
+    fuelFactor = 1
