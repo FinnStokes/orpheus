@@ -44,11 +44,14 @@ class Ship(Unit):
     
     def update(self, processed):
         if self._destination:
-            self._fuel = 0
-            self._colony.removeUnit(self)
-            self._colony = self._destination.colony
-            self._colony.addUnit(self)
-            self._destination = None
+            if self._destination.colony:
+                self._fuel = 0
+                self._colony.removeUnit(self)
+                self._colony = self._destination.colony
+                self._colony.addUnit(self)
+                self._destination = None
+            else:
+                print("Invalid destination: no colony")
         Unit.update(self, processed)
     
     def go(self, dest):
