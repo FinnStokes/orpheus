@@ -13,9 +13,9 @@ def random_description(name, planet_type):
 		'$Dg$':['$I$ is a $T$. It has $A$.',
 		        'A $T$. $I$ has $A$.',],
 		'$G$':['helium','hydrogen','oxygen','nitrogen','methane','chlorine','ammonia','carbon dioxide'],
-		'$g$':['neon', 'argon', 'krypton', 'xenon', 'radon', 'fleurine'],
+		'$g$':['neon', 'argon', 'krypton', 'xenon', 'radon', 'flourine'],
 		'$I$':['$N$','This planet','The planet $N$','This world','The world $N$'],
-		'$M$':['iron','zinc','copper','alumina','nickel','calcium carbonate','silica','silicon carbide','titanium carbide','graphite','methane','water'],
+		'$M$':['iron','zinc','copper','alumina','nickel','calcium carbonate','silica','silicon carbide','titanium carbide','graphite','methane','water','ice'],
 		'$m$':['beryllium','magnesium','calcium','strontium','barium','radium','gold','platinum','silver','cadmium','titanium','uranium','tungsten'],
 		'$S$':['$C$ surface that is composed mainly of $M$ and $M$',
 			   'surface that is composed mainly of $M$ and $M$',
@@ -40,7 +40,8 @@ def random_description(name, planet_type):
 	desc = string.replace(desc, '$T$', planet_type)
 	return desc
 
-for i in xrange(0,3):
-	print(random_description('Testington','terrestrial planet')+"\n")
-	print(random_description('Testington','dwarf planet')+"\n")
-	print(random_description('Testington','gas giant')+"\n")
+if __name__ == '__main__':
+        for i in xrange(0,3):
+                print(random_description('Testington','terrestrial planet')+"\n")
+                print(random_description('Testington','dwarf planet')+"\n")
+                print(random_description('Testington','gas giant')+"\n")
