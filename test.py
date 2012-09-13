@@ -156,7 +156,7 @@ class TestColony(unittest.TestCase):
         
         
 
-class TestShip(unittest.TestCase):
+class TestTransport(unittest.TestCase):
     def setUp(self):
         self.shipTime = 10
         self.droneTime = 10
@@ -206,10 +206,10 @@ class TestShip(unittest.TestCase):
         m2 = self.c2.getBuildings(buildings.Manufactory)[0]
         m3 = self.c3.getBuildings(buildings.Manufactory)[0]
 
-        m1.construct(units.Ship)
-        m1.construct(units.Ship)
-        m2.construct(units.Ship)
-        m3.construct(units.Ship)
+        m1.construct(units.Transport)
+        m1.construct(units.Transport)
+        m2.construct(units.Transport)
+        m3.construct(units.Transport)
         self.update(self.shipTime*2)
         s1 = self.c1.getUnit(0)
         s2 = self.c3.getUnit(0)
@@ -231,7 +231,7 @@ class TestShip(unittest.TestCase):
         self.assertResources(self.c2,0,150,100)
         self.assertResources(self.c3,3,0,0)
         
-        m1.construct(units.Ship)
+        m1.construct(units.Transport)
         self.update(self.shipTime)
         
         s1.loadFuel(500)

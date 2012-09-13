@@ -29,7 +29,7 @@ class Drone(Unit):
     def production(self):
         return Drone.ergRate
 
-class Ship(Unit):
+class Transport(Unit):
     metalCost = 1
     capacity = 1
     
