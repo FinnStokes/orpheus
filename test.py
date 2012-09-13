@@ -13,11 +13,11 @@ class TestColony(unittest.TestCase):
         self.manufactoryTime = 10
         self.reclaimTime = 10
         self.droneTime = 10
-        self.p1 = planet.Planet(5,0,0)
+        self.p1 = planet.Planet("Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,5,0,0)
         self.c1 = colony.Colony(self.p1)
-        self.p2 = planet.Planet(0,500,0)
+        self.p2 = planet.Planet("Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,500,0)
         self.c2 = colony.Colony(self.p2)
-        self.p3 = planet.Planet(0,0,150)
+        self.p3 = planet.Planet("Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,150)
         self.c3 = colony.Colony(self.p3)
         self.initial = {}
         self.store(self.c1)
@@ -158,10 +158,10 @@ class TestScout(unittest.TestCase):
     def setUp(self):
         self.scoutTime = 10
         self.manufactoryTime = 10
-        self.p1 = planet.Planet(0,0,0)
-        self.p2 = planet.Planet(0,0,0)
-        self.p3 = planet.Planet(0,0,0)
-        self.p4 = planet.Planet(0,0,0)
+        self.p1 = planet.Planet("Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p2 = planet.Planet("Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p3 = planet.Planet("Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p4 = planet.Planet("Planet4","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
         self.p1.addLink(self.p2,10)
         self.p1.addLink(self.p3,10)
         self.p1.addLink(self.p4,10)
@@ -246,9 +246,9 @@ class TestSettler(unittest.TestCase):
     def setUp(self):
         self.settlerTime = 10
         self.manufactoryTime = 10
-        self.p1 = planet.Planet(0,0,0)
-        self.p2 = planet.Planet(0,0,0)
-        self.p3 = planet.Planet(0,0,0)
+        self.p1 = planet.Planet("Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p2 = planet.Planet("Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p3 = planet.Planet("Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
         self.p1.addLink(self.p2,10)
         self.p2.addLink(self.p3,10)
         self.c1 = colony.Colony(self.p1)
@@ -301,17 +301,17 @@ class TestTransport(unittest.TestCase):
         self.shipTime = 10
         self.droneTime = 10
         self.manufactoryTime = 10
-        self.p1 = planet.Planet(0,0,0)
+        self.p1 = planet.Planet("Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
         self.c1 = colony.Colony(self.p1)
         self.c1.metal = 1
         self.c1.fuel = 90
         self.c1.food = 150
-        self.p2 = planet.Planet(0,0,0)
+        self.p2 = planet.Planet("Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
         self.c2 = colony.Colony(self.p2)
         self.c2.metal = 0
         self.c2.fuel = 150
         self.c2.food = 0
-        self.p3 = planet.Planet(0,0,0)
+        self.p3 = planet.Planet("Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
         self.c3 = colony.Colony(self.p3)
         self.c3.metal = 5
         self.c3.fuel = 70
