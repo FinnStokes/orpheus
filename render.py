@@ -23,7 +23,6 @@ class Render:
         self._scale_background()
         self.star = None
         self.scale_dirty = True
-        self.group = pygame.sprite.LayeredDirty()
     
     def _scale_background(self):
         w = self.window.get_width()
@@ -52,33 +51,18 @@ class Render:
        self.planets.append(planet)
        self.system_radius = max(planet.orbit_radius, self.system_radius)
        self.scale_dirty = True
-       w = self.window.get_width()
-       h = self.window.get_height()
-       PlanetSprite(planet,(w/2,h/2),self.group)
-       for s in self.group.sprites():
-           s.rescale(self.scale_factor*(min(w,h)*0.45)/math.log(self.system_radius+1), (w/2, h/2))
     
     def mouse_down(self,pos,button):
         if button == 5:
             self.scale_factor *= 0.5
             self.scale_dirty = True
-            w = self.window.get_width()
-            h = self.window.get_height()
-            for s in self.group.sprites():
-                s.rescale(self.scale_factor*(min(w,h)*0.45)/math.log(self.system_radius+1), pos)
         if button == 4:
             self.scale_factor *= 2
             self.scale_dirty = True
-            w = self.window.get_width()
-            h = self.window.get_height()
-            for s in self.group.sprites():
-                s.rescale(self.scale_factor*(min(w,h)*0.45)/math.log(self.system_radius+1), pos)
     
     def mouse_move(self,pos,rel,buttons):
         if buttons[0]:
             self.offset = (self.offset[0]+rel[0]/self.scale_factor, self.offset[1]+rel[1]/self.scale_factor)
-            for s in self.group.sprites():
-                s.move(rel)
 
     def draw_planet(self, planet, scale, centre):
         img = self.planet_graphics[planet]
@@ -93,56 +77,14 @@ class Render:
     def draw(self):
         if self.scale_dirty:
             self._scale_planets()
+            self.scale_dirty = False
         w = self.window.get_width()
         h = self.window.get_height()
-        self.group.clear(self.window,self.background)
-        #self.window.blit(self.background,(0,0))
-        #self.window.blit(self.background,(0,0))
+        self.window.blit(self.background,(0,0))
         scale = self.scale_factor*(min(w,h)*0.45)/math.log(self.system_radius+1)
         centre = (int(w/2 + self.offset[0]*self.scale_factor),
                   int(h/2 + self.offset[1]*self.scale_factor))
-        #pygame.draw.circle(self.window,pygame.Color("yellow"),centre,int(0.3*scale))
         if self.view == "space":
-            self.group.draw(self.window)
-            #self.window.blit(self.star,(centre[0]-int(self.sun_rad*scale),centre[1]-int(self.sun_rad*scale)))
-            #for p in self.planets:
-            #    self.draw_planet(p, scale, centre)
-
-class PlanetSprite(pygame.sprite.DirtySprite):
-    def __init__(self, planet, centre, *groups):
-        pygame.sprite.DirtySprite.__init__(self, *groups)
-        self.planet = planet
-        self.src = images.planet.convert_alpha()
-        self.image = None
-        self.scale = 1
-        self.offset = centre
-        self.rect = self._rect()
-        self.dirty = 0
-    
-    def _rect(self):
-        r = int(math.ceil(math.log(self.planet.orbit_radius+1)*self.scale))
-        planet_r = int(math.ceil(math.log(Render.earth_rad*self.planet.planet_radius+1)*self.scale))
-        x = self.offset[0] + int(math.ceil(r*math.cos(self.planet.orbit_phase))) - planet_r
-        y = self.offset[1] + int(math.ceil(r*math.sin(self.planet.orbit_phase))) - planet_r
-        return pygame.Rect(x,y,1,1)
-    
-    def rescale(self, scale, mouse):
-        self.offset = ((self.offset[0] - mouse[0])*scale/self.scale + mouse[0],
-                       (self.offset[1] - mouse[1])*scale/self.scale + mouse[1])
-        self.scale = scale
-        planet_r = int(math.ceil(math.log(Render.earth_rad*self.planet.planet_radius+1)*self.scale))
-        self.image = pygame.transform.smoothscale(self.src,(planet_r*2,planet_r*2))
-        self.rect = self._rect()
-        self.dirty = 1
-    
-    def move(self, diff):
-        self.offset = (self.offset[0] + diff[0], self.offset[1] + diff[1])
-        #self.image = None
-        self.rect = self._rect()
-        self.dirty = 1
-    
-    #def update(self):
-    #    if not self.image:
-    #        planet_rad = int(math.ceil(math.log(Render.earth_rad*(self.planet.planet_radius+1)*self.scale))
-    #        self.image = pygame.transform.smoothscale(self.src,(planet_rad*2,planet_rad*2))
-    #        self.dirty = 1
+            self.window.blit(self.star,(centre[0]-int(self.sun_rad*scale),centre[1]-int(self.sun_rad*scale)))
+            for p in self.planets:
+                self.draw_planet(p, scale, centre)

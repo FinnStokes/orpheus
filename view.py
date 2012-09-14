@@ -26,6 +26,8 @@ class View:
                 self.event.notify("window_resize", e.size)
             elif e.type == KEYDOWN:
                 self.event.notify("key_down", e.key)
+                if e.key == pygame.K_ESCAPE:
+                    self.event.notify("quit")
             elif e.type == KEYUP:
                 self.event.notify("key_up", e.key)
             elif e.type == MOUSEMOTION:
