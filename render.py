@@ -14,7 +14,7 @@ class Render:
         self.view = "space"
         self.planets = []
         self.offset = (0,0)
-    
+          
     def add_planet(self,planet):
        self.planets.append(planet)
        self.system_radius = max(planet.orbit_radius, self.system_radius)
