@@ -11,7 +11,7 @@ class Render:
         self.event.register("new_planet", self.add_planet)
         self.window = window
         self.system_radius = 0
-        self.scale_factor = 1.0
+        self.scale = 1.0
         self.view = "space"
         self.planets = []
         self.planet_img = {}
@@ -37,19 +37,14 @@ class Render:
     def _scale_planets(self):
         w = self.window.get_width()
         h = self.window.get_height()
-        if self.system_radius > 0:
-            scale = self.scale_factor*(min(w,h)*0.45)/math.log(self.system_radius+1)
-        else:
-            scale = self.scale_factor
-        self.star = pygame.transform.smoothscale(self.star_img,(int(self.sun_rad*2*scale),int(self.sun_rad*2*scale)))
+        self.star = pygame.transform.smoothscale(self.star_img,(int(self.sun_rad*2*self.scale),int(self.sun_rad*2*self.scale)))
         for p in self.planets:
-            r = int(math.ceil(math.log(p.orbit_radius+1)*scale))
-            planet_r = int(math.ceil(math.log(self.earth_rad*p.planet_radius+1.01)*scale*0.9))
+            r = int(math.ceil(math.log(p.orbit_radius+1)*self.scale))
+            planet_r = int(math.ceil(math.log(self.earth_rad*p.planet_radius+1.01)*self.scale*0.9))
             self.planet_graphics[p] = pygame.transform.smoothscale(self.planet_img[p],(planet_r*2,planet_r*2))
     
     def add_planet(self,planet):
        self.planets.append(planet)
-       self.system_radius = max(planet.orbit_radius, self.system_radius)
        if planet.planet_type == "dwarf planet":
            imgs = [images.asteroid]
        if planet.planet_type == "terrestrial planet":
@@ -60,7 +55,7 @@ class Render:
        self.scale_dirty = True
     
     def set_scale(self,scale):
-        self.scale_factor = scale
+        self.scale = scale
         self.scale_dirty = True
     
     def set_offset(self,offset):
@@ -83,10 +78,9 @@ class Render:
         w = self.window.get_width()
         h = self.window.get_height()
         self.window.blit(self.background,(0,0))
-        scale = self.scale_factor*(min(w,h)*0.45)/math.log(self.system_radius+1)
         centre = (int(self.offset[0]),
                   int(self.offset[1]))
         if self.view == "space":
-            self.window.blit(self.star,(centre[0]-int(self.sun_rad*scale),centre[1]-int(self.sun_rad*scale)))
+            self.window.blit(self.star,(centre[0]-int(self.sun_rad*self.scale),centre[1]-int(self.sun_rad*self.scale)))
             for p in self.planets:
-                self.draw_planet(p, scale, centre)
+                self.draw_planet(p, self.scale, centre)
