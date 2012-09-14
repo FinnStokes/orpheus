@@ -9,8 +9,6 @@ class Render:
     def __init__(self, eventmanager, window):
         self.event = eventmanager
         self.event.register("new_planet", self.add_planet)
-        self.event.register("mouse_down", self.mouse_down)
-        self.event.register("mouse_move", self.mouse_move)
         self.window = window
         self.system_radius = 0
         self.scale_factor = 1.0
@@ -61,21 +59,12 @@ class Render:
        self.planet_img[planet] = random.choice(imgs).convert_alpha()
        self.scale_dirty = True
     
-    def mouse_down(self,pos,button):
-        if button == 5 and self.scale_factor > 1.0:
-            self.scale_factor /= 2.0
-            self.offset = ((self.offset[0] - pos[0])/2.0 + pos[0],
-                           (self.offset[1] - pos[1])/2.0 + pos[1])
-            self.scale_dirty = True
-        if button == 4 and self.scale_factor < 32.0:
-            self.scale_factor *= 2.0
-            self.offset = ((self.offset[0] - pos[0])*2.0 + pos[0],
-                           (self.offset[1] - pos[1])*2.0 + pos[1])
-            self.scale_dirty = True
+    def set_scale(self,scale):
+        self.scale_factor = scale
+        self.scale_dirty = True
     
-    def mouse_move(self,pos,rel,buttons):
-        if buttons[0]:
-            self.offset = (self.offset[0]+rel[0], self.offset[1]+rel[1])
+    def set_offset(self,offset):
+        self.offset = offset
 
     def draw_planet(self, planet, scale, centre):
         img = self.planet_graphics[planet]
