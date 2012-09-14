@@ -68,16 +68,6 @@ class Input:
                     self.over = p
                     return
  
-    def mouse_down(self,pos,button):
-        if button == 5:
-            self.scale_factor *= 0.5
-        if button == 4:
-            self.scale_factor *= 2
-
-    def mouse_move(self,pos,rel,buttons):
-        if buttons[0]:
-            self.offset = (self.offset[0]+rel[0]/self.scale_factor, self.offset[1]+rel[1]/self.scale_factor)
-
     #open Menu when focus given to a planet
     def show_planet_menu(self, planet):
         if not (planet == None) and self.context == "SPACE":
