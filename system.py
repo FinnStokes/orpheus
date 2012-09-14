@@ -3,12 +3,16 @@ import randNames
 import desc
 import planet
 import math
+import event
+
+NAMES = ['Salve', 'Servi', 'Inanis', 'Censeo', 'Imaginibus', 'Deletis', 'Miseriam', 'Mundo', 'Fertote', 'Stulti',
+         'Utinam', 'Phantasias', 'Procausa', 'Superandi', 'Desistatis']
 
 class System:
     def __init__(self, eventmanager, seed):
         random.seed(seed)
         self._event = eventmanager
-        self._names = randNames.MName()
+        self._names = randNames.MName(2,NAMES)
         self.starName = self._randomName()
         self.planets = []
         r = 0
@@ -88,7 +92,7 @@ class System:
         return desc.random_description(name, planet_type)
 
 if __name__ == '__main__':
-    s = System(0)
+    s = System(event.EventManage(), 0)
     for p in s.planets:
         print(p)
         print(repr(p)+"\n")
