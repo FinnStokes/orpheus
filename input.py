@@ -4,11 +4,14 @@ from pygame.locals import *
 from albow.widget import Widget
 from albow.controls import Label, Button, TextField, Column, Image
 from albow.shell import Shell, Screen, TextScreen
-from albow.resource import get_font, get_image
-from albow.grid_view import GridView
-from albow.palette_view import PaletteView
+#from albow.grid_view import GridView
+#from albow.palette_view import PaletteView
 from albow.image_array import get_image_array
 from albow.dialogs import alert, ask
+
+pygame.font.init()
+myfont = pygame.font.Font("8bit_nog.ttf", 20)
+myfonts = pygame.font.Font("8bit_nog.ttf", 16)
 
 class Input:
     def __init__(self, eventmanager, window, render):
@@ -77,7 +80,7 @@ class Input:
 
     #open Menu when focus given to a planet
     def show_planet_menu(self, planet):
-        if not (planet == None):
+        if not (planet == None) and self.context == "SPACE":
             self.context = "PLANET"
             self.shell = PlanetShell(self.window, planet, self.event)
             shell.run() 
@@ -108,13 +111,13 @@ class PlanetShell(Shell):
     
 #Menu displayed when a planet is focussed
 class PlanetScreen(Screen):
+ 
     def __init__(self, shell, eventmanager, planet):
         Screen.__init__(self, shell.rect)
         self.shell = shell
         self.event = eventmanager
         self.planet = planet
-        myfont = pygame.font.Font("8bit_nog.ttf", 20)
-        myfonts = pygame.font.Font("8bit_nog.ttf", 16)
+        
         def screen_button(text, screen):
             return Button(text, font = myfonts, action = lambda: shell.show_screen(screen))
                       
@@ -136,19 +139,32 @@ class PlanetScreen(Screen):
 #colony_builds should contain all possible building names, associated with flags to indicate whether they are
 #UNBUILT, DISABLED or ENABLED
 class BuildScreen(Screen):
-    def __init__(self, shell, colony_builds):
+    
+    def __init__(self, shell, planet, eventmanager):
         Screen.__init__(self, shell.rect)
         self.shell = shell
-        myfont = pygame.font.Font("8bit_nog.ttf", 16)
+        self.planet = planet
+        self.event = eventmaanger
+    
+        self.possbuilds = []
+        self.buttons = []
+
         def screen_button(text, screen):
             return Button(text, font = myfont, action = lambda: shell.show_screen(screen))       
+    
         title = Label(shell.titletext)
+        
+        self.buttons.append(Button("Add Mine", font = myfonts,
+                                    action = self.event.notify("mine_request", self.planet.colony)));
+
+        for b in possbuilds:
+            self.buttons.append(Button("" + b.type, font = myfonts,
+                                    action = self.event.notify("building_request", self.planet.colony, b.type)))
+
+        self.buttons.append(screen_button("Back", shell.menu_screen))
 
         title.font = myfont
-        menu = Column([
-            screen_button("Back", shell.menu_screen)
-            
-        ], align='l')
+        menu = Column(self.buttons, align='l')
         contents = Column([
             title,
             menu,
@@ -158,19 +174,25 @@ class BuildScreen(Screen):
 #Menu displayed when adding units to a colonised planet
 #displays 
 class UnitScreen(Screen):
-    def __init__(self, shell, colony_resources):
+    def __init__(self, shell, planet, eventmanager):
         self.shell = shell
-        
-        myfont = pygame.font.Font("8bit_nog.ttf", 16)
+        self.planet = planet
+        self.event = eventmanager
+        self.buttons = []
+        self.possunits = []  
+    
         def screen_button(text, screen):
             return Button(text, font = myfont, action = lambda: shell.show_screen(screen))       
         title = Label(shell.titletext)
-
         title.font = myfont
-        menu = Column([
-            screen_button("Back", shell.menu_screen)
-           
-        ], align='l')
+
+        self.buttons.append(screen_button("Back", shell.menu_screen))
+        
+        for u in possunits:
+            self.buttons.append(Button("" + u.type, font = myfonts,
+                                    action = self.event.notify("unit_request", self.planet.colony, u.type)))
+      
+        menu = Column(self.buttons, align='l')
         contents = Column([
             title,
             menu,
