@@ -36,11 +36,17 @@ class EventManage:
 # update(dt)
 # Called periodically with dt set to the time in seconds it was last produced
 
+# new_turn()
+# Called when a turn is ended, causing model to update
+
 # key_down(keyid)
 # Called when a key is pressed, keyid to be interpreted by pygame.locals 
 
 # key_up(keyid)
 # Called when a key is released, keyid to be interpreted by pygame.locals 
+
+# new_planet(planet)
+# Called when a new planet is added to the system 
 
 # resourceupdate(resourceid, amount)
 # Update available amount of a resource, for reflection in interface

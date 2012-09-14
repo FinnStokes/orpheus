@@ -5,8 +5,9 @@ import planet
 import math
 
 class System:
-    def __init__(self, seed):
+    def __init__(self, eventmanager, seed):
         random.seed(seed)
+        self._event = eventmanager
         self._names = randNames.MName()
         self.starName = self._randomName()
         self.planets = []
@@ -22,6 +23,10 @@ class System:
         for i in range(0,nOuter):
             r = self._newGasPlanet(r)
     
+    def update():
+        for p in planets:
+            p.update()
+    
     def _newTerrestrialPlanet(self,r):
         name = self._randomName()
         description = self._randomDescription(name,"terrestrial planet")
@@ -32,7 +37,9 @@ class System:
         metal = random.randint(5,7)
         fuel = random.randint(0,3)*50
         food = random.randint(13,20)*5
-        self.planets.append(planet.Planet(name,description,"terrestrial planet",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food))
+        p = planet.Planet(name,description,"terrestrial planet",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
+        self.planets.append(p)
+        self._event.notify("new_planet",p)
         return orbit_radius
     
     def _newGasPlanet(self,r):
@@ -45,7 +52,9 @@ class System:
         metal = 0
         fuel = random.randint(6,14)*50
         food = random.randint(1,5)*5
-        self.planets.append(planet.Planet(name,description,"gas giant",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food))
+        p = planet.Planet(name,description,"gas giant",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
+        self.planets.append(p)
+        self._event.notify("new_planet",p)
         return orbit_radius
     
     def _newAsteroidField(self,r):
@@ -68,7 +77,9 @@ class System:
         metal = random.randint(5,7)
         fuel = 0
         food = random.randint(3,10)*5
-        self.planets.append(planet.Planet(name,description,"dwarf planet",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food))
+        p = planet.Planet(name,description,"dwarf planet",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
+        self.planets.append(p)
+        self._event.notify("new_planet",p)
     
     def _randomName(self):
         return self._names.New()

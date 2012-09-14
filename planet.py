@@ -13,6 +13,10 @@ class Planet:
         self.fuel = fuel
         self.food = food
     
+    def update():
+        if self.colony:
+            self.colony.update()
+    
     def addLink(self, planet, fuelCost):
         self.links[planet] = fuelCost
 
