@@ -16,6 +16,7 @@ class Render:
         self.scale_factor = 1.0
         self.view = "space"
         self.planets = []
+        self.planet_img = {}
         self.planet_graphics = {}
         self.background_img = images.background.convert()
         self.star_img = images.star.convert_alpha()
@@ -46,18 +47,18 @@ class Render:
         for p in self.planets:
             r = int(math.ceil(math.log(p.orbit_radius+1)*scale))
             planet_rad = int(math.ceil(math.log(self.earth_rad*p.planet_radius+1)*scale))
-            if p.planet_type == "dwarf planet":
-                imgs = [images.asteroid]
-            if p.planet_type == "terrestrial planet":
-                imgs = [images.planet]
-            if p.planet_type == "gas giant":
-                imgs = [images.star]
-            img = random.choice(imgs)
-            self.planet_graphics[p] = pygame.transform.smoothscale(img,(planet_rad*2,planet_rad*2))
+            self.planet_graphics[p] = pygame.transform.smoothscale(self.planet_img[p],(planet_rad*2,planet_rad*2))
     
     def add_planet(self,planet):
        self.planets.append(planet)
        self.system_radius = max(planet.orbit_radius, self.system_radius)
+       if planet.planet_type == "dwarf planet":
+           imgs = [images.asteroid]
+       if planet.planet_type == "terrestrial planet":
+           imgs = [images.planet]
+       if planet.planet_type == "gas giant":
+           imgs = [images.orange_gas_giant, images.blue_gas_giant]
+       self.planet_img[planet] = random.choice(imgs).convert_alpha()
        self.scale_dirty = True
     
     def mouse_down(self,pos,button):
