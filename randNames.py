@@ -35,7 +35,7 @@ class MName:
     """
     A name from a Markov chain
     """
-    def __init__(self, chainlen = 2):
+    def __init__(self, chainlen = 2, examples = PLACES):
         """
         Building the dictionary
         """
@@ -47,7 +47,7 @@ class MName:
         oldnames = []
         self.chainlen = chainlen
     
-        for l in PLACES:
+        for l in examples:
             l = l.strip()
             oldnames.append(l)
             s = " " * chainlen + l
