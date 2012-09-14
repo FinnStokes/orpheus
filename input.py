@@ -1,4 +1,5 @@
-import os, sys
+import pygame, os, sys, math
+import images
 from pygame.locals import *
 from albow.widget import Widget
 from albow.controls import Label, Button, TextField, Column, Image
@@ -9,25 +10,61 @@ from albow.palette_view import PaletteView
 from albow.image_array import get_image_array
 from albow.dialogs import alert, ask
 
-
-
-
 class Input:
-    font_path = "Resources/fonts/8bit_nog.ttf"
-
     def __init__(self, eventmanager, window, render):
        self.event = eventmanager
        self.window = window
        self.render = render
-       self.event.register("planet_open", self.show_planet_menu)
-       self.event.register("mouse_down", self.mouse_down) 
-       self.event.register("mouse_down", self.mouse_down)
-        
+       self.event.register("select_planet", self.show_planet_menu)
+       self.event.register("new_planet", self.add_planet)
+       self.event.register("mouse_up", self.mouse_up)
+       self.event.register("mouse_move", self.mouse_move)
+       self.scale = 1.0
+       self.offset = (0,0)
+       self.planets = []
+       self.over = None
+       self.selected = None
+       self.marker = images.marker.convert_alpha()
+       self.context = "SPACE"
+
     #draw interface
     def draw(self):
-        pass
-    #draw current menu
+        if self.over:
+            x = self.over.x*self.scale + self.offset[0] - self.marker.get_width()/2
+            y = self.over.y*self.scale + self.offset[1] - self.marker.get_height()/2
+            self.window.blit(self.marker,(int(x),int(y)))
+        if self.selected:
+            x = self.selected.x*self.scale + self.offset[0] - self.marker.get_width()/2
+            y = self.selected.y*self.scale + self.offset[1] - self.marker.get_height()/2
+            self.window.blit(self.marker,(int(x),int(y)))
 
+    def set_scale(self, scale):
+        self.scale = scale
+
+    def set_offset(self, offset):
+        self.offset = offset
+    
+    def add_planet(self, planet):
+        self.planets.append(PlanetButton(planet))
+
+    def mouse_up(self,pos,button):
+        if self.over:
+            self.selected = self.over
+            self.event.notify("select_planet", self.over.planet)
+        else:
+            self.selected = None
+            self.event.notify("select_planet", None)
+
+    def mouse_move(self,pos,rel,buttons):
+        world_pos = ((pos[0] - self.offset[0])/self.scale, (pos[1] - self.offset[1])/self.scale)
+        if self.over and not self.over.is_over(world_pos):
+            self.over = None
+        if not self.over:
+            for p in self.planets:
+                if p.is_over(world_pos):
+                    self.over = p
+                    return
+ 
     def mouse_down(self,pos,button):
         if button == 5:
             self.scale_factor *= 0.5
@@ -39,23 +76,27 @@ class Input:
             self.offset = (self.offset[0]+rel[0]/self.scale_factor, self.offset[1]+rel[1]/self.scale_factor)
 
     #open Menu when focus given to a planet
-    def show_planet_menu(planet_info):
-        pass
-
+    def show_planet_menu(self, planet):
+        if not (planet == None):
+            self.context = "PLANET"
+            self.shell = PlanetShell(self.window, planet, self.event)
+            shell.run() 
+        
     #close Menu when focus 
-    def close_planet_menu
+    def close_planet_menu(self):
         pass    
     
 #UI Shell, initialised when a planet is focussed
 class PlanetShell(Shell):
 
-    def __init__(self, display, planet_info):
+    def __init__(self, display, planet, eventmanager):
         Shell.__init__(self, display)
+        self.event = eventmanager
+        self.planet = planet
         #create menus
-        self.root_screen = PlanetScreen(self)
-        self.titletext = "PLANET " + planet_name
-      
-        #display management
+        self.titletext = "Planet " + planet.name
+        self.root_screen = PlanetScreen(self, eventmanager, planet)
+       #display management
         self.set_timer(50)
     
     def create_screens(self):
@@ -67,22 +108,22 @@ class PlanetShell(Shell):
     
 #Menu displayed when a planet is focussed
 class PlanetScreen(Screen):
-    def __init__(self, shell, planet_name, colony_builds, colony_resources, colony_units):
+    def __init__(self, shell, eventmanager, planet):
         Screen.__init__(self, shell.rect)
         self.shell = shell
-        
-        myfont = pygame.font.Font("8bit_nog.ttf", 16)
+        self.event = eventmanager
+        self.planet = planet
+        myfont = pygame.font.Font("8bit_nog.ttf", 20)
+        myfonts = pygame.font.Font("8bit_nog.ttf", 16)
         def screen_button(text, screen):
-            return Button(text, font = myfont, action = lambda: shell.show_screen(screen))
-
-        def event_button(text, buildid):
-            return Button(text, font = myfont, action = None)
-                
+            return Button(text, font = myfonts, action = lambda: shell.show_screen(screen))
+                      
         title = Label(shell.titletext)
         title.font = myfont
         menu = Column([
-            screen_button("Build", shell.build_screen),
-            screen_button("Units", shell.unit_screen),
+            screen_button("Build", shell.build_screen, enable = not (self.planet.colony == None) ),
+            screen_button("Units", shell.unit_screen, enable = not (self.planet.colony == None)),
+            Button("Colonise", font = myfonts, action = self.event.notify("colonise_planet", self.planet))
         ], align='l')
         contents = Column([
             title,
@@ -98,7 +139,6 @@ class BuildScreen(Screen):
     def __init__(self, shell, colony_builds):
         Screen.__init__(self, shell.rect)
         self.shell = shell
-        
         myfont = pygame.font.Font("8bit_nog.ttf", 16)
         def screen_button(text, screen):
             return Button(text, font = myfont, action = lambda: shell.show_screen(screen))       
@@ -107,7 +147,7 @@ class BuildScreen(Screen):
         title.font = myfont
         menu = Column([
             screen_button("Back", shell.menu_screen)
-            )
+            
         ], align='l')
         contents = Column([
             title,
@@ -129,12 +169,25 @@ class UnitScreen(Screen):
         title.font = myfont
         menu = Column([
             screen_button("Back", shell.menu_screen)
-           )
+           
         ], align='l')
         contents = Column([
             title,
             menu,
         ], align = 'l', spacing = 20)
         self.center(contents)   
-
+      
+class PlanetButton:
+    earth_rad = 0.000042*500
     
+    def __init__(self, planet):
+        self.planet = planet
+        r = math.log(planet.orbit_radius+1)
+        self.x = r*math.cos(planet.orbit_phase)
+        self.y = r*math.sin(planet.orbit_phase)
+        
+        self.r = math.log(self.earth_rad*(planet.planet_radius+0.5+0.25/planet.planet_radius)+1.01)*0.9
+        self.r2 = self.r*self.r
+    
+    def is_over(self, pos):
+        return ((self.x - pos[0])*(self.x - pos[0]) + (self.y - pos[1])*(self.y - pos[1])) < self.r2    
