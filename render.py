@@ -2,7 +2,7 @@ import pygame, sys, math
 from pygame.locals import *
 
 class Render:
-    earth_rad = 0.000042*2000
+    earth_rad = 0.000042*500
     def __init__(self, eventmanager, window):
         self.event = eventmanager
         self.event.register("new_planet", self.add_planet)
@@ -33,13 +33,13 @@ class Render:
         self.window.fill(pygame.Color("black"))
         w = self.window.get_width()
         h = self.window.get_height()
-        scale = self.scale_factor*(min(w,h)*0.45)/self.system_radius
+        scale = self.scale_factor*(min(w,h)*0.45)/math.log(self.system_radius+1)
         centre = (int(w/2 + self.offset[0]*self.scale_factor),
                   int(h/2 + self.offset[1]*self.scale_factor))
         pygame.draw.circle(self.window,pygame.Color("yellow"),centre,int(0.3*scale))
         if self.view == "space":
             for p in self.planets:
-                r = int(math.ceil(p.orbit_radius*scale))
+                r = int(math.ceil(math.log(p.orbit_radius+1)*scale))
                 x = int(math.ceil(centre[0] + r*math.cos(p.orbit_phase)))
                 y = int(math.ceil(centre[1] + r*math.sin(p.orbit_phase)))
                 if p.planet_type != "dwarf planet":
@@ -50,5 +50,5 @@ class Render:
                     c = pygame.Color("blue")
                 if p.planet_type == "gas giant":
                     c = pygame.Color("red")
-                pygame.draw.circle(self.window,c,(x,y),int(self.earth_rad*p.planet_radius*scale))
+                pygame.draw.circle(self.window,c,(x,y),int(math.log(self.earth_rad*p.planet_radius+1)*scale))
             
