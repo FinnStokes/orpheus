@@ -1,5 +1,6 @@
 import pygame, os, sys, math
 import images
+import random
 from pygame.locals import *
 
 class Render:
@@ -18,7 +19,7 @@ class Render:
         self.planet_graphics = {}
         self.background_img = images.background.convert()
         self.star_img = images.star.convert_alpha()
-        self.offset = (0,0)
+        self.offset = (self.window.get_width()/2,self.window.get_height()/2)
         self.background = None
         self._scale_background()
         self.star = None
@@ -45,7 +46,14 @@ class Render:
         for p in self.planets:
             r = int(math.ceil(math.log(p.orbit_radius+1)*scale))
             planet_rad = int(math.ceil(math.log(self.earth_rad*p.planet_radius+1)*scale))
-            self.planet_graphics[p] = pygame.transform.smoothscale(self.star_img,(planet_rad*2,planet_rad*2))
+            if p.planet_type == "dwarf planet":
+                imgs = [images.asteroid]
+            if p.planet_type == "terrestrial planet":
+                imgs = [images.planet]
+            if p.planet_type == "gas giant":
+                imgs = [images.star]
+            img = random.choice(imgs)
+            self.planet_graphics[p] = pygame.transform.smoothscale(img,(planet_rad*2,planet_rad*2))
     
     def add_planet(self,planet):
        self.planets.append(planet)
@@ -54,15 +62,19 @@ class Render:
     
     def mouse_down(self,pos,button):
         if button == 5:
-            self.scale_factor *= 0.5
+            self.scale_factor /= 2.0
+            self.offset = ((self.offset[0] - pos[0])/2.0 + pos[0],
+                           (self.offset[1] - pos[1])/2.0 + pos[1])
             self.scale_dirty = True
         if button == 4:
-            self.scale_factor *= 2
+            self.scale_factor *= 2.0
+            self.offset = ((self.offset[0] - pos[0])*2.0 + pos[0],
+                           (self.offset[1] - pos[1])*2.0 + pos[1])
             self.scale_dirty = True
     
     def mouse_move(self,pos,rel,buttons):
         if buttons[0]:
-            self.offset = (self.offset[0]+rel[0]/self.scale_factor, self.offset[1]+rel[1]/self.scale_factor)
+            self.offset = (self.offset[0]+rel[0], self.offset[1]+rel[1])
 
     def draw_planet(self, planet, scale, centre):
         img = self.planet_graphics[planet]
@@ -82,8 +94,8 @@ class Render:
         h = self.window.get_height()
         self.window.blit(self.background,(0,0))
         scale = self.scale_factor*(min(w,h)*0.45)/math.log(self.system_radius+1)
-        centre = (int(w/2 + self.offset[0]*self.scale_factor),
-                  int(h/2 + self.offset[1]*self.scale_factor))
+        centre = (int(self.offset[0]),
+                  int(self.offset[1]))
         if self.view == "space":
             self.window.blit(self.star,(centre[0]-int(self.sun_rad*scale),centre[1]-int(self.sun_rad*scale)))
             for p in self.planets:
