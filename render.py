@@ -46,8 +46,8 @@ class Render:
         self.star = pygame.transform.smoothscale(self.star_img,(int(self.sun_rad*2*scale),int(self.sun_rad*2*scale)))
         for p in self.planets:
             r = int(math.ceil(math.log(p.orbit_radius+1)*scale))
-            planet_rad = int(math.ceil(math.log(self.earth_rad*p.planet_radius+1)*scale))
-            self.planet_graphics[p] = pygame.transform.smoothscale(self.planet_img[p],(planet_rad*2,planet_rad*2))
+            planet_r = int(math.ceil(math.log(self.earth_rad*p.planet_radius+1.01)*scale*0.9))
+            self.planet_graphics[p] = pygame.transform.smoothscale(self.planet_img[p],(planet_r*2,planet_r*2))
     
     def add_planet(self,planet):
        self.planets.append(planet)
@@ -62,12 +62,12 @@ class Render:
        self.scale_dirty = True
     
     def mouse_down(self,pos,button):
-        if button == 5:
+        if button == 5 and self.scale_factor > 1.0:
             self.scale_factor /= 2.0
             self.offset = ((self.offset[0] - pos[0])/2.0 + pos[0],
                            (self.offset[1] - pos[1])/2.0 + pos[1])
             self.scale_dirty = True
-        if button == 4:
+        if button == 4 and self.scale_factor < 32.0:
             self.scale_factor *= 2.0
             self.offset = ((self.offset[0] - pos[0])*2.0 + pos[0],
                            (self.offset[1] - pos[1])*2.0 + pos[1])
@@ -80,9 +80,9 @@ class Render:
     def draw_planet(self, planet, scale, centre):
         img = self.planet_graphics[planet]
         r = int(math.ceil(math.log(planet.orbit_radius+1)*scale))
-        planet_rad = int(math.ceil(math.log(self.earth_rad*planet.planet_radius+1)*scale))
-        x = int(math.ceil(centre[0] + r*math.cos(planet.orbit_phase))) - planet_rad
-        y = int(math.ceil(centre[1] + r*math.sin(planet.orbit_phase))) - planet_rad
+        planet_r = int(math.ceil(math.log(self.earth_rad*planet.planet_radius+1.01)*scale*0.9))
+        x = int(math.ceil(centre[0] + r*math.cos(planet.orbit_phase))) - planet_r
+        y = int(math.ceil(centre[1] + r*math.sin(planet.orbit_phase))) - planet_r
         if planet.planet_type != "dwarf planet":
             pygame.draw.circle(self.window,pygame.Color("white"),centre,r,1)
         self.window.blit(img,(x,y))
