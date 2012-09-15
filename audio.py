@@ -9,7 +9,7 @@ class AudioManage:
 
     building_barks = { 
             "Manufactory" : pygame.mixer.Sound("snd/manubark.ogg"),
-            "Reclamation Factory" : pygame.mixer.Sound("snd/reclaim.ogg"),
+            "Reclamation Facility" : pygame.mixer.Sound("snd/reclaim.ogg"),
             "Fuel Extractor" : pygame.mixer.Sound("snd/fuelextract.ogg"),
             "Hydroponics Module" : pygame.mixer.Sound("snd/hydroponicbark.ogg")
     }

@@ -120,6 +120,7 @@ class Input:
             elif self.over:
                 if self.selected_unit:
                     self.selected_unit.go(self.over.planet)
+                    self.selected_unit = None
                 else:
                     self.selected = self.over
                     self.event.notify("select_planet", self.over.planet)
