@@ -8,7 +8,7 @@ def units():
         except TypeError: pass
 
 class Unit:
-    ergCost = 10
+    ergCost = 5
     metalCost = 0
     foodCost = 0
     fuelCost = 0
