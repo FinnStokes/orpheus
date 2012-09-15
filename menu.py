@@ -25,7 +25,8 @@ class Widget:
             if i > 0: 
                 for j in range(0, i):
                     child.y += parent.children[j].get_childrens_height();
-
+                       
+                
             self.update_pos(child);                                     
       
     def draw(self):
@@ -38,8 +39,11 @@ class Widget:
         parent.children.append(child)                      
  
     def rect(self):
-        return pygame.Rect(self.x, self.y, self.w,self.h)
-       
+        return pygame.Rect(self.x, self.y, self.sw,self.sh)
+
+    def setrect(self, w, h):
+        self.sw = w
+        self.sh = h
 
 class Menu:
 
@@ -78,8 +82,11 @@ class Menu:
         #draw box, then text
             pygame.draw.rect(self.render.window, self.colour, (self.x, self.y, self.w, self.h))                 
             self.render.window.blit(self.font.render(self.text, 1, (0,0,0)), (self.x, self.y, self.w, self.h))
+            
+        for i in range(0, len(self.children)):
+            self.children[i].draw()
      
-        
+     
 
     def add(self, child):
         child.parent = self
@@ -100,7 +107,8 @@ class Menu:
     def mouse_up(self, pos, button):
         if button == 1 and self.is_on(pos):
             if self.hasevent:
-                self.event.notify(self.action[0], self.action[1])
+            #    if(len(self.action[1])>1):
+                self.event.notify(self.action[0], *self.action[1])                   
             else:
                 self.action()
         
