@@ -28,7 +28,7 @@ def random_description(name, planet_type):
 		'$M$':['iron','zinc','copper','alumina','nickel','calcium carbonate','silica','silicon carbide','titanium carbide','graphite','methane','water','ice'],
 		'$m$':['beryllium','magnesium','calcium','strontium','barium','radium','gold','platinum','silver','cadmium','titanium','uranium','tungsten'],
                 '$Wd$':['frankly tiny','comically small','puny','practically invisible'],
-                '$Wg$':['massive','humongous','ridicullously huge','gigantic'],
+                '$Wg$':['massive','humongous','ridiculously huge','gigantic'],
 		'$S$':['$C$ surface that is composed mainly of $M$ and $M$',
 			   'surface that is composed mainly of $M$ and $M$',
 		       '$C$ surface that is mostly composed of $M$ with deposits of $m$',
