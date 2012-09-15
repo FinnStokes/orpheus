@@ -16,6 +16,7 @@ class Planet:
         self.metal = metal
         self.fuel = fuel
         self.food = food
+        self.escape_fuel = (2*self.mass / self.planet_radius)**0.5
     
     def update():
         if self.colony:

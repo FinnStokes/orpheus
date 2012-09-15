@@ -12,6 +12,7 @@ class Unit:
     metalCost = 0
     foodCost = 0
     fuelCost = 0
+    name = ""
     def __init__(self, eventmanager, colony):
         self._event = eventmanager
         self._colony = colony
@@ -28,12 +29,14 @@ class Unit:
 class Drone(Unit):
     metalCost = 1
     ergRate = 1
+    name = "Drone"
     
     def production(self):
         return Drone.ergRate
 
 class Ship(Unit):
     fuelFactor = 1
+    name = "Ship"
     
     def __init__(self, eventmanager, colony):
         Unit.__init__(self, eventmanager, colony)
@@ -75,7 +78,8 @@ class Ship(Unit):
 class Transport(Ship):
     metalCost = 1
     capacity = 1
-    
+    name = "Transport"
+
     def __init__(self, eventmanager, colony):
         Ship.__init__(self, eventmanager, colony)
         self._event.register("load", self.handle_load)
@@ -183,7 +187,8 @@ class Transport(Ship):
 class Settler(Ship):
     metalCost = 2
     fuelFactor = 4
-    
+    name = "Settler"
+
     def update(self, processed):
         if self._destination and not self._destination.colony:
             self._destination.colonise()
@@ -194,6 +199,19 @@ class Settler(Ship):
         else:
             Ship.update(self, processed)
 
-class Scout(Ship):
-    metalCost = 1
-    fuelFactor = 1
+# class Scout(Ship):
+#     name = "Scout"
+#     metalCost = 1
+#     fuelFactor = 1
+#     def update(self, processed):
+#         if self._destination:
+#             if self._destination.colony:
+#                 self._event.notify("unit_moved", self, self._destination)
+#                 self._fuel = 0
+#                 self._colony.removeUnit(self)
+#                 self._colony = self._destination.colony
+#                 self._colony.addUnit(self)
+#                 self._destination = None
+#             else:
+#                 print("Invalid destination: no colony")
+#         Unit.update(self, processed)
