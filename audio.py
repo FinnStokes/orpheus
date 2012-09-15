@@ -34,10 +34,10 @@ class AudioManage:
         pygame.mixer.music.load(AudioManage.bgm)
         pygame.mixer.music.play(-1)
 
-    def sound_on_build(self, project):
+    def sound_on_build(self, thing, project):
         AudioManage.building_barks[project.name].play()
    
-    def sound_on_unit(self, project):
+    def sound_on_unit(self,thing, project):
         AudioManage.unit_barks[project.name].play()
      
     def sound_on_mine(self, project):
