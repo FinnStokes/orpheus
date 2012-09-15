@@ -28,12 +28,15 @@ class System:
         nInner = random.randint(3,6)
         for i in range(0,nInner):
             r = self._newTerrestrialPlanet(r)
+
+        random.choice(self.planets).colonise()
         
         r = self._newAsteroidField(r)
         
         nOuter = random.randint(3,6)
         for i in range(0,nOuter):
             r = self._newGasPlanet(r)
+        
         
         for p1 in self.planets:
             for p2 in self.planets:
