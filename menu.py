@@ -40,7 +40,7 @@ class Menu:
 
     pygame.font.init()
     TEXT_OFFSET = (5, 5)
-    myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 20)
+    myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 18)
  
     def __init__(self, id, w, h, eventmanager, render, text, action, visible = False, colour = pygame.Color("white")):
         self.id = id
@@ -53,7 +53,7 @@ class Menu:
         self.render = render
         self.text = text
         self.TEXT_OFFSET = Menu.TEXT_OFFSET
-        self.font = myfont
+        self.font = Menu.myfont
         self.colour = colour
         self.event.register("mouse_up", self.mouse_up)              
     
@@ -73,30 +73,29 @@ class Menu:
             self.render.window.blit(self.font.render(self.text, 1, (0,0,0)), (self.x, self.y, self.w, self.h))
             pygame.display.update()
 
-
     def add(self, child):
         child.parent = self
         self.children.append(child)
 
     def expose_children(self):
         for c in range(0, len(self.children)):
-            c.visible = True   
+            self.children[c].visible = True   
         self.action = self.hide_children
     
 
     def hide_children(self):
         for c in range(0, len(self.children)):
-            c.visible = False
+            self.children[c].visible = False
         self.action = self.expose_children
 
          
     def mouse_up(self, pos, button):
-        if button == 1 and is_on(pos):
+        if button == 1 and self.is_on(pos):
             self.action()
 
     def is_on(self, pos):
-        res = (pos.x >= self.x) and (pos.x <= self.x + self.w)
-        res = res and (pos.y >= self.y) and (pos.x <= self.y + self.h)        
+        res = (pos[0] >= self.x) and (pos[0] <= self.x + self.w)
+        res = res and (pos[1] >= self.y) and (pos[1] <= self.y + self.h)        
         return res
 
 
