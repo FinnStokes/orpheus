@@ -1,5 +1,4 @@
 from collections import deque
-import units
 
 class Colony:
     def __init__(self, eventmanager, planet):
@@ -18,7 +17,6 @@ class Colony:
         self._units = []
         self._addUnits = []
         self._delUnits = []
-        self.addUnit(units.Drone(self._event,self))
     
     def update(self):
         processed = []

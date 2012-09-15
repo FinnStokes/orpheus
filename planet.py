@@ -1,4 +1,5 @@
 import colony
+import units
 
 class Planet:
     def __init__(self, eventmanager, name, description, planet_type, planet_radius, mass, orbit_radius, orbit_phase, metal, fuel, food):
@@ -29,6 +30,7 @@ class Planet:
     def colonise(self):
         if not self.colony:
             c = colony.Colony(self._event, self)
+            c.addUnit(units.Drone(self._event,self))
             self._event.notify("new_colony", c)
 
     def __str__(self):
