@@ -63,14 +63,14 @@ class EventManage:
 # abandon(planet)
 # Remove colony and improvements from a planet
 
-# loadship(ship, resources)
+# load(ship, resource_name, amount)
 # Load some resources onto a ship
 
-# unloadship(ship)
-# Unload all resources from a docked ship
+# load_unit(transport, target)
+# Load target unit onto given transport
 
-# upgradeship(colony, ship, upgrade)
-# Make an improvement to a ship via the as yet only suggested Astronautics Division building
+# unload(ship)
+# Unload all resources from a docked ship
 
 # build_mine(planet)
 # Build a mine on the given planet
@@ -102,7 +102,7 @@ class EventManage:
 # unit_queued(planet, unit)
 # Notification that a unit has been accepted into the build queue
 
-# transport(ship, dest)
+# move(ship, dest)
 # 
 
 #

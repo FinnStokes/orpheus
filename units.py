@@ -37,6 +37,7 @@ class Ship(Unit):
     
     def __init__(self, eventmanager, colony):
         Unit.__init__(self, eventmanager, colony)
+        self._event.register("move", self.handle_move)
         self._destination = None
         self._fuel = 0
     
@@ -56,6 +57,10 @@ class Ship(Unit):
                 print("Invalid destination: no colony")
         Unit.update(self, processed)
     
+    def handle_move(self, unit, dest):
+        if unit == self and dest != self._colony.planet:
+            self.go(dest)
+    
     def go(self, dest):
         fuelCost = self._colony.costTo(dest)*self.fuelFactor
         if self._colony.fuel >= fuelCost - self._fuel:
@@ -73,6 +78,9 @@ class Transport(Ship):
     
     def __init__(self, eventmanager, colony):
         Ship.__init__(self, eventmanager, colony)
+        self._event.register("load", self.handle_load)
+        self._event.register("load_unit", self.handle_load_unit)
+        self._event.register("unload", self.handle_unload)
         self._payloadType = ""
         self._payload = None
         self.fuelFactor = self.capacity+1
@@ -81,6 +89,23 @@ class Transport(Ship):
         Ship.update(self, processed)
         if self._payloadType:
             self.unload()
+    
+    def handle_load(self, unit, resource, amount):
+        if unit == self:
+            if resource == "Metal":
+                self.loadMetal(amount)
+            elif resource == "Food":
+                self.loadFood(amount)
+            elif resource == "Fuel":
+                self.loadFuel(amount)
+    
+    def handle_unload(self, unit):
+        if unit == self:
+            self.unload()
+    
+    def handle_load_unit(self, transport, target):
+        if transport == self:
+            self.loadUnit(target)
     
     def unload(self):
         if self._payloadType == "Metal":
