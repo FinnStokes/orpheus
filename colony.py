@@ -172,6 +172,12 @@ class BuildBuilding(Project):
             b = self.building(self._event, colony)
             colony._buildings.append(b)
             self._event.notify("built",colony.planet,b)
+            if self.building.metalCost != 0:
+                self._event.notify("resourceupdate",colony.planet,"Metal",colony.planet.metal)
+            if self.building.fuelCost != 0:
+                self._event.notify("resourceupdate",colony.planet,"Fuel",colony.planet.fuel)
+            if self.building.foodCost != 0:
+                self._event.notify("resourceupdate",colony.planet,"Food",colony.planet.food)
 
     def fail(self, colony):
-        self._event.notify("build_cancelled",colony.planet,b)
+        self._event.notify("build_cancelled",colony.planet,self.building)

@@ -97,6 +97,11 @@ class Menu:
         child.parent = self
         self.children.append(child)
 
+    def remove(self, child):
+        if child.parent == self and child in self.children:
+            self.children.remove(child)
+            child.parent = None
+
     def expose_children(self):
         for c in range(0, len(self.children)):
             self.children[c].visible = True   

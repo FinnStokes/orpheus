@@ -49,6 +49,10 @@ class Input:
        self.event.register("mouse_move", self.mouse_move)
        self.event.register("new_turn", self.new_turn)
        self.event.register("resourceupdate", self.update_resources)
+       self.event.register("unit_built", self.unit_built)
+       self.event.register("unit_destroyed", self.unit_destroyed)
+       self.event.register("unit_moved", self.unit_moved)
+       self.event.register("select_unit", self.select_unit)
        self.scale = 1.0
        self.offset = (0,0)
        self.planets = []
@@ -69,6 +73,7 @@ class Input:
        self.hresources = self.myfont.render("", 1, (255,255,255), (0,0,0))
        self.hresourcesrect = self.hresources.get_rect()
        self.hresourcesrect.bottomright = self.window.get_rect().bottomright
+       self.selected_unit = None
 
     #draw interface
     def draw(self):
@@ -80,10 +85,11 @@ class Input:
             x = self.selected.x*self.scale + self.offset[0] - self.marker.get_width()/2
             y = self.selected.y*self.scale + self.offset[1] - self.marker.get_height()/2
             self.window.blit(self.marker,(int(x),int(y)))
-            self.widget.update()
             self.planettext.render(self.window)
             self.window.blit(self.planetname, self.planetnamerect)
-            self.widget.draw()
+            if self.widget:
+                self.widget.update()
+                self.widget.draw()
             self.window.blit(self.resources, self.resourcesrect)
             if self.hresources:
                 self.window.blit(self.hresources, self.hresourcesrect)
@@ -112,11 +118,17 @@ class Input:
             if self.endturnbtn.collidepoint(pos):
                 self.event.notify("new_turn")
             elif self.over:
-                self.selected = self.over
-                self.event.notify("select_planet", self.over.planet)
+                if self.selected_unit:
+                    self.selected_unit.go(self.over.planet)
+                else:
+                    self.selected = self.over
+                    self.event.notify("select_planet", self.over.planet)
             else:
-                self.selected = None
-                self.event.notify("select_planet", None)
+                if self.selected_unit:
+                    self.selected_unit = None
+                else:
+                    self.selected = None
+                    self.event.notify("select_planet", None)
 
     def mouse_move(self,pos,rel,buttons):
         world_pos = ((pos[0] - self.offset[0])/self.scale, (pos[1] - self.offset[1])/self.scale)
@@ -130,7 +142,7 @@ class Input:
  
     #open Menu when focus given to a planet
     def show_planet_menu(self, planet):
-        if not (planet == None):
+        if not (planet == None) and planet.colony:
             self.make_planet_menu(planet)
             
             #self.shell = PlanetShell(self.window, planet, self.event)
@@ -179,7 +191,7 @@ class Input:
         build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", (planet,),), True)
         build_menu = menu.Menu("build menu",150, 40,self.event, self.render, "BUILD", None, True)
         unit_menu = menu.Menu("unit menu", 150,40,self.event, self.render, "UNIT",None, True)
-        transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
+        self.transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
     
         for b in buildings.buildings():
             build_menu.add(menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0])[:6], ("build", (planet, b[1])),comment=Input.build_comments[str(b[0])]))
@@ -187,12 +199,41 @@ class Input:
 
         for u in units.units():
             unit_menu.add(menu.Menu(str(u[0]), 150, 40, self.event, self.render, str(u[0])[:6], ("build_unit",(planet,u[1])),comment=Input.unit_comments[str(u[0])]))
-  
+
+        for u in planet.colony.units():
+            self.transport_menu.add(menu.Menu(u, 150, 40, self.event, self.render, u.name, ("select_unit", (u,))))
 
         self.widget.add(self.widget, build_mine)
         self.widget.add(self.widget, build_menu)
         self.widget.add(self.widget, unit_menu)
-        self.widget.add(self.widget, transport_menu)
+        self.widget.add(self.widget, self.transport_menu)
+
+    def unit_built(self, planet, unit):
+        if self.selected and self.selected.planet == planet and self.transport_menu:
+            self.transport_menu.add(menu.Menu(unit, 150, 40, self.event, self.render, unit.name, ("select_unit", (unit,))))
+    
+    def unit_destroyed(self, unit):
+        if unit in self.selected.planet.colony.units():
+            rem = None
+            for m in self.transport_menu.children:
+                if m.id == unit:
+                    rem = m
+                    break
+            self.transport_menu.remove(m)
+    
+    def unit_moved(self, unit, to):
+        if  self.selected and self.selected.planet == to and self.transport_menu:
+            self.transport_menu.add(menu.Menu(unit, 150, 40, self.event, self.render, unit.name, ("select_unit", (unit,))))
+        elif unit in self.selected.planet.colony.units():
+            rem = None
+            for m in self.transport_menu.children:
+                if m.id == unit:
+                    rem = m
+                    break
+            self.transport_menu.remove(m)
+    
+    def select_unit(self, unit):
+        self.selected_unit = unit
 
 class TextField:
     def __init__(self, text, font, width, antialias=True, foreground=(255,255,255), background=(0,0,0)):
