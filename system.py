@@ -58,7 +58,7 @@ class System:
         orbit_radius = r + random.triangular(0.2,0.8)
         orbit_phase = random.uniform(0,2*math.pi)
         metal = random.randint(5,7)
-        fuel = random.randint(3,6)*50
+        fuel = random.randint(3,6)*100
         food = random.randint(13,20)*5
         p = planet.Planet(self._event,name,description,"terrestrial planet",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
         self.planets.append(p)
@@ -73,7 +73,7 @@ class System:
         orbit_radius = r + random.triangular(4.0,10.0)
         orbit_phase = random.uniform(0,2*math.pi)
         metal = 0
-        fuel = random.randint(6,14)*50
+        fuel = random.randint(6,14)*100
         food = random.randint(1,5)*5
         p = planet.Planet(self._event,name,description,"gas giant",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
         self.planets.append(p)
