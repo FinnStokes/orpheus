@@ -1,6 +1,8 @@
 import pygame, os, sys, math
 import images
 import menu
+import buildings
+import units
 from pygame.locals import *
 #from albow.widget import Widget
 #from albow.controls import Label, Button, TextField, Column, Image
@@ -20,6 +22,7 @@ class Input:
               "Reclaim",
               "Fuel Extract",
               "Hydroponics"]
+    
     units = ["Drone",
              "Transport",
             "Settler"
@@ -107,11 +110,15 @@ class Input:
         unit_menu = menu.Menu("unit menu", 150,40,self.event, self.render, "UNIT",None, True)
         transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
     
-        for b in Input.builds:
-            build_menu.add(menu.Menu(b, 150, 40, self.event, self.render, b, ("build", (planet,b))))
+        for b in buildings.buildings():
+            build_menu.add(menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0]), ("build", (planet,b[1]))))
+            print(str(b[0]))
 
-        for u in Input.units:
-            unit_menu.add(menu.Menu(u, 150, 40, self.event, self.render, u, ("build_unit",(planet,u))))
+        for u in units.units():
+            unit_menu.add(menu.Menu(str(u), 150, 40, self.event, self.render, str(u), ("build_unit",(planet,u))))
+            print(str(u))
+    
+
 
         self.widget.add(self.widget, build_mine)
         self.widget.add(self.widget, build_menu)
