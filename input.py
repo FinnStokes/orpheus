@@ -55,8 +55,8 @@ class Input:
             x = self.selected.x*self.scale + self.offset[0] - self.marker.get_width()/2
             y = self.selected.y*self.scale + self.offset[1] - self.marker.get_height()/2
             self.window.blit(self.marker,(int(x),int(y)))
-            self.window.blit(self.planettext, self.planettextrect)
             self.widget.update()
+            self.planettext.render(self.window)
             self.widget.draw()    
 
     def set_scale(self, scale):
@@ -90,7 +90,7 @@ class Input:
     #open Menu when focus given to a planet
     def show_planet_menu(self, planet):
         if not (planet == None):
-            self.make_planet_menu(planet)              
+            self.make_planet_menu(planet)
             
             #self.shell = PlanetShell(self.window, planet, self.event)
             #self.shell.run() 
@@ -98,10 +98,9 @@ class Input:
  
     def show_planet_desc(self, planet):
         if planet:
-            self.planettext = Input.myfonts.render(planet.description, True, (255,255,255), (0,0,0))
-            self.planettextrect = self.planettext.get_rect()
-            self.planettextrect.centerx = self.window.get_rect().centerx
-            self.planettextrect.centery = self.window.get_rect().centery
+            self.planettext = TextField(planet.description, Input.myfonts, 500)
+            self.planettext.centerx = self.window.get_rect().centerx
+            self.planettext.centery = self.window.get_rect().centery
 
     def make_planet_menu(self, planet):
         self.widget = menu.Widget(0, 0, self.event, self.render)
@@ -111,20 +110,46 @@ class Input:
         transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
     
         for b in buildings.buildings():
-            build_menu.add(menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0]), ("build", (planet,b[1]))))
-            print(str(b[0]))
+            build_menu.add(menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0])[:6], ("build", (planet, b[1]))))
+          
 
         for u in units.units():
-            unit_menu.add(menu.Menu(str(u), 150, 40, self.event, self.render, str(u), ("build_unit",(planet,u))))
-            print(str(u))
-    
-
+            unit_menu.add(menu.Menu(str(u[0]), 150, 40, self.event, self.render, str(u[0])[:6], ("build_unit",(planet,u[1]))))
+  
 
         self.widget.add(self.widget, build_mine)
         self.widget.add(self.widget, build_menu)
         self.widget.add(self.widget, unit_menu)
         self.widget.add(self.widget, transport_menu)
 
+class TextField:
+    def __init__(self, text, font, width, antialias=True, foreground=(255,255,255), background=(0,0,0)):
+        words = text.split(" ")
+        line = ""
+        self.lines = []
+        self.width = width
+        self.height = 0
+        for word in words:
+            new_line = line + word + " "
+            (w, h) = font.size(new_line)
+            if w > width:
+                rect = pygame.Rect(0,self.height,w,h)
+                self.height += h
+                self.lines.append((font.render(line, antialias, foreground, background),rect))
+                line = word + " "
+            else:
+                line = new_line
+        rect = pygame.Rect(0,self.height,w,h)
+        self.height += h
+        self.lines.append((font.render(line, antialias, foreground, background),rect))
+        self.centerx = 0
+        self.centery = 0
+        
+    def render(self,window):
+        for line in self.lines:
+            rect = line[1]
+            window.blit(line[0], pygame.Rect(rect.x - self.width/2 + self.centerx, rect.y - self.height/2 + self.centery, rect.width, rect.height))
+    
 class PlanetButton:
     earth_rad = 0.000042*500
     
