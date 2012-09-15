@@ -34,6 +34,15 @@ class Drone(Unit):
     def production(self):
         return Drone.ergRate
 
+class Orpheus(Unit):
+    metalCost = 20
+    fuelCost = 1000
+    foodCost = 1000
+    name = "Orpheus"
+    def __init__(self, eventmanager, colony):
+        Unit.__init__(self, eventmanager, colony)
+        self._event.notify("win")
+
 class Ship(Unit):
     fuelFactor = 1
     name = "Ship"
