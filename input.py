@@ -74,7 +74,7 @@ class Input:
         self.planets.append(PlanetButton(planet))
 
     def mouse_up(self,pos,button):
-        if button == 1 and not(self.widget and self.widget.rect().collidepoint(pos)):
+        if button == 1 and not(self.selected and self.widget and self.widget.rect().collidepoint(pos)):
             if self.endturnbtn.collidepoint(pos):
                 self.event.notify("new_turn")
             elif self.over:
