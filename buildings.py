@@ -9,7 +9,7 @@ def buildings():
 
 class Building:
     name = "Building"
-    ergCost = 5
+    ergCost = 10
     metalCost = 0
     foodCost = 0
     fuelCost = 0
