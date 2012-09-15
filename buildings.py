@@ -43,6 +43,7 @@ class Manufactory(Building):
     def construct(self, unit):
         if self.okay(unit):
             self._queue.append(unit)
+            self._event.notify("unit_queued", self.colony.planet, unit)
     
     def update(self, processed):
         if len(self._queue) > 0:
