@@ -111,7 +111,7 @@ class System:
         return desc.random_description(name, planet_type)
 
 if __name__ == '__main__':
-    s = System(event.EventManage(), 0)
+    s = System(event.EventManage())
     for p in s.planets:
         print(p)
         print(repr(p)+"\n")
