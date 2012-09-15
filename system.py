@@ -17,8 +17,8 @@ NAMES = [ 'Quo', 'Usque', 'Tandem', 'Abutere', 'Catilina', 'Patientia', 'Nostra'
 class System:
     star_mass = 14
     
-    def __init__(self, eventmanager, seed):
-        random.seed(seed)
+    def __init__(self, eventmanager):
+        random.seed()
         self._event = eventmanager
         self._names = randNames.MName(2,NAMES)
         self.starName = self._randomName()

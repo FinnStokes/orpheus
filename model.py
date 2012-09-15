@@ -9,7 +9,7 @@ class Model:
 
     def __init__(self, eventmanager):
         self.event = eventmanager
-        self.system = system.System(eventmanager,0)
+        self.system = system.System(eventmanager)
         self.event.register("new_turn", self.update)
     
     def update():
