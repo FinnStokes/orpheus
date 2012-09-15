@@ -67,11 +67,13 @@ class Render:
         img = self.planet_graphics[planet]
         r = int(math.ceil(math.log(planet.orbit_radius+1)*scale))
         planet_r = int(math.ceil(math.log(self.earth_rad*planet.planet_radius+1.01)*scale*0.9))
-        x = int(math.ceil(centre[0] + r*math.cos(planet.orbit_phase))) - planet_r
-        y = int(math.ceil(centre[1] + r*math.sin(planet.orbit_phase))) - planet_r
+        x = int(math.ceil(centre[0] + r*math.cos(planet.orbit_phase)))
+        y = int(math.ceil(centre[1] + r*math.sin(planet.orbit_phase)))
         if planet.planet_type != "dwarf planet":
             pygame.draw.circle(self.window,pygame.Color("white"),centre,r,1)
-        self.window.blit(img,(x,y))
+        self.window.blit(img,(x - planet_r, y - planet_r))
+        if planet.colony:
+            pygame.draw.circle(self.window,pygame.Color("red"),(x,y),int(planet_r*1.2),1)
     
     def draw(self):
         if self.scale_dirty:
