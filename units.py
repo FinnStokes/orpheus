@@ -3,7 +3,7 @@ from colony import Colony
 def units():
     for (name, o) in globals().iteritems():
         try:
-            if (o != Unit) and issubclass(o, Unit):
+            if (o != Unit) and (o != Ship) and issubclass(o, Unit):
                 yield name, o
         except TypeError: pass
 
@@ -33,6 +33,15 @@ class Drone(Unit):
     
     def production(self):
         return Drone.ergRate
+
+class Orpheus(Unit):
+    metalCost = 20
+    fuelCost = 1000
+    foodCost = 1000
+    name = "Orpheus"
+    def __init__(self, eventmanager, colony):
+        Unit.__init__(self, eventmanager, colony)
+        self._event.notify("win")
 
 class Ship(Unit):
     fuelFactor = 1

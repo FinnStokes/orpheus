@@ -6,6 +6,7 @@ import audio
 from pygame.locals import *
 
 class View:
+    myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 150)
     
     def __init__(self, eventmanager, window):
         self.event = eventmanager
@@ -13,6 +14,8 @@ class View:
         self.event.register("new_planet", self.new_planet)
         self.event.register("mouse_down", self.mouse_down)
         self.event.register("mouse_move", self.mouse_move)
+        self.event.register("win", self.win)
+        self.window = window
         pygame.display.set_caption("Orpheus")
         self.render = render.Render(eventmanager, window)
         self.mix = audio.AudioManage(eventmanager)
@@ -25,6 +28,7 @@ class View:
         self._set_scale()
         self.render.set_offset(self.offset)
         self.input.set_offset(self.offset)
+        self.winScreen = False
    
     def update(self, dt):
         
@@ -47,9 +51,19 @@ class View:
             elif e.type == MOUSEBUTTONUP:
                 self.event.notify("mouse_up", e.pos, e.button)
 
-        self.render.draw()
-        self.input.draw()
+        if self.winScreen:
+            self.draw_win_screen()
+        else:
+            self.render.draw()
+            self.input.draw()
         pygame.display.update()
+    
+    def win(self):
+        self.winScreen = True
+    
+    def draw_win_screen(self):
+        self.window.fill(pygame.Color("black"))
+        self.render.window.blit(self.myfont.render("You Win!", 1, (255,255,255)), (75, 200, 500, 100))
     
     def _set_scale(self):
         scale = self.scale_factor*(min(self.width,self.height)*0.45)/math.log(self.system_radius+1)
