@@ -6,49 +6,40 @@ class AudioManage:
     
     bgm = "snd/orpheusarrives.ogg"
  
-    barks = [
 
-        #builds
-         [
-            pygame.mixer.Sound("snd/manubark.ogg"),
-            pygame.mixer.Sound("snd/reclaim.ogg"),
-            pygame.mixer.Sound("snd/fuelextract.ogg"),
-            pygame.mixer.Sound("snd/hydroponicbark.ogg"),
-         ],
+    building_barks = { 
+            "Manufactory" : pygame.mixer.Sound("snd/manubark.ogg"),
+            "Reclamation Factory" : pygame.mixer.Sound("snd/reclaim.ogg"),
+            "Fuel Extractor" : pygame.mixer.Sound("snd/fuelextract.ogg"),
+            "Hydroponics Module" : pygame.mixer.Sound("snd/hydroponicbark.ogg")
+    }
+    
+    unit_barks = {
+            "Drone" : pygame.mixer.Sound("snd/dronebark.ogg"),
+            "Transport" : pygame.mixer.Sound("snd/transportbark.ogg"),
+            "Settler" : pygame.mixer.Sound("snd/settlerbark.ogg")
+    }
         
-        #units 
-        [
-            pygame.mixer.Sound("snd/dronebark.ogg"),
-            pygame.mixer.Sound("snd/transportbark.ogg"),
-            pygame.mixer.Sound("snd/settlerbark.ogg"),
-            pygame.mixer.Sound("snd/scoutbark.ogg"),
-        ],
-        
-        pygame.mixer.Sound("snd/minebark.ogg"),
-    ]
+    mine_bark = pygame.mixer.Sound("snd/minebark.ogg")
+    
 
    
     def __init__(self, eventmanager):
         self.event = eventmanager
 
-        self.barks = AudioManage.barks
-        self.event.register("build_project", self.sound_on_build)
-        self.event.register("build_unit", self.sound_on_unit)
-        self.event.register("build_mine", self.sound_on_build)
- 
-
+        self.event.register("built", self.sound_on_build)
+        self.event.register("unit_built", self.sound_on_unit)
+        self.event.register("mine_built", self.sound_on_mine)
      
         pygame.mixer.music.load(AudioManage.bgm)
         pygame.mixer.music.play(-1)
 
-    def sound_on_build(self, project_id):
-        barks[0][project_id].play()
+    def sound_on_build(self, project):
+        AudioManage.building_barks[project.name].play()
    
-    def sound_on_unit(self, project_id):
-        barks[1][project_id].play()
-   
-   
-  
+    def sound_on_unit(self, project):
+        AudioManage.unit_barks[project.name].play()
+     
     def sound_on_mine(self):
-        barks[2].play()
+        AudioManage.mine_bark.play()
  

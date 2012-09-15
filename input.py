@@ -11,15 +11,17 @@ from albow.dialogs import alert, ask
 
 pygame.font.init()
 
-myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 20)
-myfonts = pygame.font.Font("res/fonts/8bit_nog.ttf", 16)
 
 class Input:
+    myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 20)
+    myfonts = pygame.font.Font("res/fonts/8bit_nog.ttf", 16)
+
     def __init__(self, eventmanager, window, render):
        self.event = eventmanager
        self.window = window
        self.render = render
        self.event.register("select_planet", self.show_planet_menu)
+       self.event.register("select_planet", self.show_planet_desc)
        self.event.register("new_planet", self.add_planet)
        self.event.register("mouse_up", self.mouse_up)
        self.event.register("mouse_move", self.mouse_move)
@@ -41,7 +43,8 @@ class Input:
             x = self.selected.x*self.scale + self.offset[0] - self.marker.get_width()/2
             y = self.selected.y*self.scale + self.offset[1] - self.marker.get_height()/2
             self.window.blit(self.marker,(int(x),int(y)))
-
+            self.window.blit(self.planettext, self.planettextrect)
+    
     def set_scale(self, scale):
         self.scale = scale
 
@@ -73,13 +76,25 @@ class Input:
     def show_planet_menu(self, planet):
         if not (planet == None) and self.context == "SPACE":
             self.context = "PLANET"
-            self.shell = PlanetShell(self.window, planet, self.event)
-            self.shell.run() 
-        
+            
+            
+            #self.shell = PlanetShell(self.window, planet, self.event)
+            #self.shell.run() 
+         
     #close Menu when focus 
     def close_planet_menu(self):
         pass    
+ 
+    def show_planet_desc(self, planet):
+        if planet:
+            self.planettext = Input.myfonts.render(planet.description, True, (255,255,255), (0,0,0))
+            self.planettextrect = self.planettext.get_rect()
+            self.planettextrect.centerx = self.window.get_rect().centerx
+            self.planettextrect.centery = self.window.get_rect().centery
     
+    
+             
+
 #UI Shell, initialised when a planet is focussed
 class PlanetShell(Shell):
 
@@ -93,6 +108,7 @@ class PlanetShell(Shell):
         self.root_screen = PlanetScreen(self, eventmanager, planet)
        #display management
         self.set_timer(50)
+        self.show_menu()
     
     def create_screens(self):
         self.build_screen = BuildScreen(self, self.event, self.planet)
@@ -100,7 +116,7 @@ class PlanetShell(Shell):
         self.transport_screen = TransportScreen(self, self.event, self.planet)  
     
     def show_menu(self):
-        self.show_screen(self.menu_screen)   
+        self.show_screen(self.root_screen)   
     
 #Menu displayed when a planet is focussed
 class PlanetScreen(Screen):
@@ -110,17 +126,23 @@ class PlanetScreen(Screen):
         self.shell = shell
         self.event = eventmanager
         self.planet = planet
-        
+        self.buttons = []
+
         def screen_button(text, screen):
             return Button(text, font = myfonts, action = lambda: shell.show_screen(screen))
-                      
+      
+        buttons = [
+            screen_button("Build", shell.build_screen),
+            screen_button("Units", shell.unit_screen),
+            Button("Colonise", font = myfonts, action = self.event.notify("colonise_planet", self.planet))
+        ]   
+        buttons[0].enabled = not (self.planet.colony==None)
+        buttons[1].enabled = not (self.planet.colony==None)        
+        
         title = Label(shell.titletext)
         title.font = myfont
-        menu = Column([
-            screen_button("Build", shell.build_screen),#, enable = not (self.planet.colony == None) ),
-            screen_button("Units", shell.unit_screen),#, enable = not (self.planet.colony == None)),
-            Button("Colonise", font = myfonts, action = self.event.notify("colonise_planet", self.planet))
-        ], align='l')
+        menu = Column(buttons, align='l')
+    
         contents = Column([
             title,
             menu,
@@ -199,18 +221,24 @@ class UnitScreen(Screen):
 class TransportScreen(Screen):
     def __init__(self, shell, planet, eventmanager):
         Screen.__init__(self, shell.rect)
+        self.planet = planet
+        self.event = eventmanager
         self.buttons = []
         self.buttons.append(Button("Back",font=myfonts, action = self.back))
  
 
     def ship_ready(self, ship):
-        pass
+        self.event.register("select_planet", self.transport_dest_selected)
 
-    #Handles select_planet events once ship has been selected. If selected planet exists and 
+    #Handles select_planet events once ship has been selected. If selected planet exists, is linked and 
     #has a colony if ship is not settler
     #transport is approved, this function deregistered 
     def transport_dest_selected(self, dest):
-        pass
+    #do transportation
+    
+    #deregister
+        self.event.deregister("select_planet", self.transport_dest_selected)    
+
 
     def back(self):
         self.parent.show_menu()   
