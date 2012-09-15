@@ -131,7 +131,7 @@ class Input:
         screen_width, screen_height = self.window.get_size()
 
         self.widget = menu.Widget(0, 0, self.event, self.render)
-        self.widget.setrect(150, screen_height)
+        self.widget.setrect(150, screen_height-40)
         build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", (planet,),), True)
         build_menu = menu.Menu("build menu",150, 40,self.event, self.render, "BUILD", None, True)
         unit_menu = menu.Menu("unit menu", 150,40,self.event, self.render, "UNIT",None, True)
