@@ -77,17 +77,17 @@ class View:
     
     def mouse_down(self,pos,button):
         if button == 5 and self.scale_factor > 1.0:
-            self.scale_factor /= 2.0
+            self.scale_factor /= 2.0**0.5
             self._set_scale()
-            self.offset = ((self.offset[0] - pos[0])/2.0 + pos[0],
-                           (self.offset[1] - pos[1])/2.0 + pos[1])
+            self.offset = ((self.offset[0] - pos[0])/2.0**0.5 + pos[0],
+                           (self.offset[1] - pos[1])/2.0**0.5 + pos[1])
             self.render.set_offset(self.offset)
             self.input.set_offset(self.offset)
         if button == 4 and self.scale_factor < 32.0:
-            self.scale_factor *= 2.0
+            self.scale_factor *= 2.0**0.5
             self._set_scale()
-            self.offset = ((self.offset[0] - pos[0])*2.0 + pos[0],
-                           (self.offset[1] - pos[1])*2.0 + pos[1])
+            self.offset = ((self.offset[0] - pos[0])*2.0**0.5 + pos[0],
+                           (self.offset[1] - pos[1])*2.0**0.5 + pos[1])
             self.render.set_offset(self.offset)
             self.input.set_offset(self.offset)
     
