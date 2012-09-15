@@ -6,121 +6,6 @@ ROOT
 </div>
 </body>
 <script>
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
-
-function Menu(parent, id, x, y, w, h, visible) {
-  this.x = x;
-  this.y = y;
-  this.w = w;
-  this.h = h;
-  this.id = id; 
-  this.visible = visible;
-  this.parent = parent;
-  this.root = false;
-  this.submenu = new Array(); // must be array of Menu()
-  
-  this.getHeights = function() {
-    var obj = this.submenu;
-    var height = 0;
-    
-    if (obj.length > 0) {
-      for (var i=0; i < obj.length; i++) {
-        if (obj[i].visible) {
-          height += obj[i].h;
-          height += obj[i].getHeights();
-        }
-      }
-    }
-    return height;
-  };
-
-  this.draw1 = function() {
-    // Draw Root
-    if (this.root) {
-    } else {
-      // Draw Itself
-      var parentY = this.parent.y;
-
-      var x = this.x;
-      var y = this.y - this.h - parent.getHeights();
-      // To get Y
-      // Get height of it's visible children
-      // Get height of parent children
-      // SCRAPPED - Get height of parent children's visible children
-      
-      var w = this.w;
-      var h = this.h;
-      var id = this.id;
-      
-      console.log("x: {1} y: {2} w: {3} h: {4}\t {0}".format(id, x, y, w, h));
-
-      ctx.fillStyle = "#F00";
-      ctx.fillRect(x, y, w, h);
-    }
-    
-    // Draw Children
-    if (this.submenu.length > 0) {
-      for (var i=0; i < this.submenu.length; i++){
-        this.submenu[i].draw(offset);
-      }
-    }
-  };
-  
-  this.draw = function(x, y) {
-    // var x = this.x;
-    // var y = offset;
-    var w = this.w;
-    var h = this.h;
-    
-    // Draw
-    ctx.fillStyle = "#F00";
-    ctx.fillRect(x-1, y-1, w+2, h+2);
-    
-    ctx.fillStyle = "#000";
-    
-    if (this.id == "child0" || this.id == "child1" || this.id == "child2")
-      ctx.fillStyle = "#FFF";
-      
-    ctx.fillRect(x, y, w, h);
-    
-    var submenu = this.submenu;
-    var totalHeight = 0;
-    var childrenHeight = y + h;
-    
-    for (var i=0; i < submenu.length; i++) {
-      submenu[i].draw(x, totalHeight);
-      totalHeight += submenu[i].h;
-    }
-    
-    console.log(this.id + " " + y);
-    
-    return totalHeight;
-  };
-  
-  this.add = function(id, w, h, visible) {
-    var x = this.x;
-    var y = this.y;
-    
-    this.submenu.push(
-      new Menu(this, id, x, y, w, h, visible));
-  };
-}
-
-var rootMenu = new Menu(0, "root", 0, 0, 167, 40, true);
-rootMenu.root = true;
-
-rootMenu.add("description", 167, 40, false);
-rootMenu.add("resources", 167, 40, false);
-rootMenu.add("buildings", 167, 40, true);
-rootMenu.add("units", 167, 40, true);
-
-rootMenu.submenu[0].add("child0", 167, 40, true);
-rootMenu.submenu[0].add("child1", 167, 40, true);
-rootMenu.submenu[0].add("child2", 167, 40, true);
-
-rootMenu.draw(0,0);
-
 String.prototype.format = function() {
   var args = arguments;
   return this.replace(/{(\d+)}/g, function(match, number) { 
@@ -130,5 +15,159 @@ String.prototype.format = function() {
     ;
   });
 };
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+function Menu(id, w, h, color) {
+  this.id = id;
+  this.color = color;
+  this.x = 0;
+  this.y = 0;
+  this.w = w;
+  this.h = h;
+  
+  this.visible = false;
+  this.parent = null;
+  this.children = new Array();
+
+  this.update = function() {
+    // this.updatePosition();
+  };
+  
+  this.draw = function() {
+    // console.log("x: {1} y: {2} \t w: {3} h: {4} \t id: {0}".format(this.id, this.x, this.y, this.w, this.h));
+    
+    // Draw itself
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.w, this.h);
+    
+    // Draw children
+    for(var i=0; i < this.children.length; i++)
+      this.children[i].draw();
+  };
+  
+  this.add = function(obj) {
+    var parent = this;
+    obj.parent = this;
+    obj.x = parent.x;
+    obj.y = parent.y + parent.h;
+
+    for (var i=0; i < parent.children.length; i++)
+      obj.y += parent.children[i].h;
+    
+    parent.children.push(obj);
+  };
+  
+  this.getChildrensHeight = function() {
+    var parent = this;
+    var totalHeight = parent.h;
+    
+    for (var i=0; i < parent.children.length; i++)
+      totalHeight += parent.children[i].getChildrensHeight();
+    
+    return totalHeight;
+  };
+  
+  this.updatePosition = function(){
+    for (var i=0; i < this.children.length; i++) {
+      var parent = this.children[i].parent;
+      var obj = this.children[i];
+      var y = parent.y + parent.h;
+      
+      obj.y = y;
+      
+      if (i > 0)
+        for (var j=0; j < i; j++)
+          obj.y += parent.children[j].getChildrensHeight();
+      
+      this.children[i].updatePosition();
+    }
+  };
+
+}
+
+function Container(x,y) {
+  this.x = x;
+  this.y = y;
+  this.w = 0;
+  this.h = 0;
+  
+  this.children = new Array();
+  
+  this.update = function() {
+    for (var i=0; i < this.children.length; i++) {
+      var parent = this.children[i].parent;
+      var obj = this.children[i];
+      var y = parent.y + parent.h;
+      
+      obj.y = y;
+      
+      if (i > 0)
+        for (var j=0; j < i; j++)
+          obj.y += parent.children[j].getChildrensHeight();
+      
+      this.children[i].updatePosition();
+    }
+  };
+  
+  this.draw = function() {
+    for(var i=0; i < this.children.length; i++)
+      this.children[i].draw();
+  };
+    
+  this.add = function(obj) {
+    var parent = this;
+    obj.parent = this;
+    obj.x = parent.x;
+    obj.y = parent.y;
+
+    for (var i=0; i < parent.children.length; i++)
+      obj.y += parent.children[i].getChildrensHeight();
+    
+    parent.children.push(obj);
+  };
+}
+
+var root = new Container(10, 20);
+
+root.add( new Menu("description", 300, 50, "red") );
+
+root.children[0].add( new Menu("Child description", 300, 50, "rgba(0, 255, 0, 0.5)") );
+root.children[0].add( new Menu("Child description", 300, 50, "rgba(0, 255, 255, 0.5)") );
+root.children[0].add( new Menu("Child description", 300, 50, "rgba(255, 0, 0, 0.5)") );
+
+root.add( new Menu("buildings", 300, 50, "rgba(0,50,50,0.2)") );
+
+root.children[1].add( new Menu("Child description", 300, 50, "rgba(0, 255, 0, 0.5)") );
+root.children[1].add( new Menu("Child description", 300, 50, "rgba(0, 255, 255, 0.5)") );
+root.children[1].add( new Menu("Child description", 300, 50, "rgba(255, 0, 0, 0.5)") );
+
+root.draw();
+
+root.children[0].children.splice(0, 1);
+root.children[0].children.splice(1, 1);
+
+ctx.clearRect(0,0,1024,600);
+root.update();
+root.draw();
+
+/*
+#Root
+
+  ##Description
+    ###Display
+    
+  ##Resources
+    ###Display
+    
+  ##Buildings
+    ###Factory
+    ###Hydroponics
+    
+  ##Units
+    ###Worker
+    ###Transport
+*/
 </script>
 </html>
