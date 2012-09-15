@@ -3,7 +3,7 @@ from colony import Colony
 def units():
     for (name, o) in globals().iteritems():
         try:
-            if (o != Unit) and issubclass(o, Unit):
+            if (o != Unit) and (o != Ship) and issubclass(o, Unit):
                 yield name, o
         except TypeError: pass
 
