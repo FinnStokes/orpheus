@@ -53,6 +53,7 @@ class Input:
             y = self.selected.y*self.scale + self.offset[1] - self.marker.get_height()/2
             self.window.blit(self.marker,(int(x),int(y)))
             self.window.blit(self.planettext, self.planettextrect)
+            self.widget.update()
             self.widget.draw()    
 
     def set_scale(self, scale):
@@ -100,22 +101,22 @@ class Input:
 
     def make_planet_menu(self, planet):
         self.widget = menu.Widget(0, 0, self.event, self.render)
-        build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", planet), True)
+        build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", (planet)), True)
         build_menu = menu.Menu("build menu",150, 40,self.event, self.render, "BUILD", None, True)
         unit_menu = menu.Menu("unit menu", 150,40,self.event, self.render, "UNIT",None, True)
         transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
     
         for b in Input.builds:
-            build_menu.add(menu.Menu(b, 150, 40, self.event, self.render, b, ("build",(planet,b))))
+            build_menu.add(menu.Menu(b, 150, 40, self.event, self.render, b, ("build", (planet,b))))
 
         for u in Input.units:
-            unit_menu.add(menu.Menu(u, 150, 40, self.event, self.render, u, self.event.notify("build_unit",(planet,u))))
+            unit_menu.add(menu.Menu(u, 150, 40, self.event, self.render, u, ("build_unit",(planet,u))))
 
+        self.widget.add(self.widget, build_mine)
+        self.widget.add(self.widget, build_menu)
+        self.widget.add(self.widget, unit_menu)
+        self.widget.add(self.widget, transport_menu)
 
-
-
-    
-    
 class PlanetButton:
     earth_rad = 0.000042*500
     
