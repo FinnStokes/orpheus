@@ -52,7 +52,6 @@ def get_font(size, name):
 	font = font_cache.get(key)
 	if not font:
 		path = resource_path("fonts", name)
-		print "OUTPUT LOG "  + path
 		font = pygame.font.Font(path, size)
 		font_cache[key] = font
 	return font
