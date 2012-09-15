@@ -64,48 +64,46 @@ class EventManage:
 # Remove colony and improvements from a planet
 
 # loadship(ship, resources)
-# load some resources onto a ship
+# Load some resources onto a ship
 
 # unloadship(ship)
-# unload all resources from a docked ship
+# Unload all resources from a docked ship
 
 # upgradeship(colony, ship, upgrade)
-# make an improvement to a ship via the as yet only suggested Astronautics Division building
+# Make an improvement to a ship via the as yet only suggested Astronautics Division building
 
 # build_mine(planet)
-# build a mine on the given planet
+# Build a mine on the given planet
 
 # build(planet,building)
-# build the given building on the given planet
+# Build the given building on the given planet
 
 # build_unit(planet,unit)
-# build the given unit on the given planet
+# Build the given unit on the given planet
 
 # reclaim_unit(unit)
-# reclaim the given unit, converting it to metal
+# Reclaim the given unit, converting it to metal
 
 # mine_built(planet)
-# notification that a mine has been successfully constructed
+# Notification that a mine has been successfully constructed
 
 # built(planet,building)
-# notification that a building has been successfully constructed
+# Notification that a building has been successfully constructed
 
 # unit_built(planet,unit)
-# notification that a unit has been successfully constructed
+# Notification that a unit has been successfully constructed
 
 # unit_destroyed(unit)
-# notification that a unit has been removed
+# Notification that a unit has been removed
 
 # unit_moved(unit, to)
+# Notification that a unit has been moved to a given planet. 
+
+# unit_queued(planet, unit)
+# Notification that a unit has been accepted into the build queue
 
 # transport(ship, dest)
 # 
-
-# queueproject(projectid, colony)
-# 
-
-# completeproject(projectid, colony)
-# notification that a project has been successfully completed
 
 #
 #
