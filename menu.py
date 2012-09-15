@@ -8,14 +8,16 @@ class Widget:
         self.h = 0
         self.children = []
         self.event = eventmanager
+        self.event.register("update_widget", self.update)
 
     def update(self):
         self.update_pos(self)   
 
     def update_pos(self, obj):
-        for i in range(0, len(self.children)):
-            parent = self.children[i].parent           
-            child = self.children[i]
+        for i in range(0, len(obj.children)):
+            parent = obj.children[i].parent           
+            child = obj.children[i]
+            
             y = parent.y + parent.h 
             
             child.y = y
@@ -24,7 +26,7 @@ class Widget:
                 for j in range(0, i):
                     child.y += parent.children[j].get_childrens_height();
 
-            update_pos(child);                                     
+            self.update_pos(child);                                     
       
     def draw(self):
         for i in range(0, len(self.children)):
@@ -32,9 +34,12 @@ class Widget:
                 self.children[i].draw()
 
     def add(self, parent, child):
-        obj.parent = parent
+        child.parent = parent
         parent.children.append(child)                      
-        
+ 
+    def rect():
+        pygame.Rect(self.x, self.y, self.w,self.h)
+       
 
 class Menu:
 
@@ -51,6 +56,7 @@ class Menu:
         self.children = [] 
         self.event = eventmanager
         self.render = render
+        self.visible = visible
         self.text = text
         self.TEXT_OFFSET = Menu.TEXT_OFFSET
         self.font = Menu.myfont
@@ -70,10 +76,10 @@ class Menu:
     def draw(self):
         if self.visible:
         #draw box, then text
-            pygame.draw(self.render.window, colour, (self.x, self.y, self.w, self.h)) 
-                 
+            pygame.draw.rect(self.render.window, self.colour, (self.x, self.y, self.w, self.h))                 
             self.render.window.blit(self.font.render(self.text, 1, (0,0,0)), (self.x, self.y, self.w, self.h))
-            pygame.display.update()
+     
+        
 
     def add(self, child):
         child.parent = self
@@ -83,18 +89,18 @@ class Menu:
         for c in range(0, len(self.children)):
             self.children[c].visible = True   
         self.action = self.hide_children
-    
+        self.event.notify("update_widget")
 
     def hide_children(self):
         for c in range(0, len(self.children)):
             self.children[c].visible = False
         self.action = self.expose_children
-
+        self.event.notify("update_widget")
          
     def mouse_up(self, pos, button):
         if button == 1 and self.is_on(pos):
             if self.hasevent:
-                self.event.notify(action[0], *action[1])
+                self.event.notify(self.action[0], self.action[1])
             else:
                 self.action()
         
@@ -109,7 +115,8 @@ class Menu:
         totalheight = parent.h
     
         for i in range(0, len(parent.children)):
-            totalheight += parent.children[i].get_childrens_height()
+            if parent.children[i].visible:
+                totalheight += parent.children[i].get_childrens_height()
         return totalheight
 #Root
 

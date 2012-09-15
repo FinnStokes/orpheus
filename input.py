@@ -1,6 +1,8 @@
 import pygame, os, sys, math
 import images
 import menu
+import buildings
+import units
 from pygame.locals import *
 #from albow.widget import Widget
 #from albow.controls import Label, Button, TextField, Column, Image
@@ -20,6 +22,7 @@ class Input:
               "Reclaim",
               "Fuel Extract",
               "Hydroponics"]
+    
     units = ["Drone",
              "Transport",
             "Settler"
@@ -52,6 +55,7 @@ class Input:
             x = self.selected.x*self.scale + self.offset[0] - self.marker.get_width()/2
             y = self.selected.y*self.scale + self.offset[1] - self.marker.get_height()/2
             self.window.blit(self.marker,(int(x),int(y)))
+            self.widget.update()
             self.planettext.render(self.window)
             self.window.blit(self.planetname, self.planetnamerect)
             self.widget.draw()    
@@ -105,18 +109,23 @@ class Input:
 
     def make_planet_menu(self, planet):
         self.widget = menu.Widget(0, 0, self.event, self.render)
-        build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", planet), True)
+        build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", (planet)), True)
         build_menu = menu.Menu("build menu",150, 40,self.event, self.render, "BUILD", None, True)
         unit_menu = menu.Menu("unit menu", 150,40,self.event, self.render, "UNIT",None, True)
         transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
     
-        for b in Input.builds:
-            build_menu.add(menu.Menu(b, 150, 40, self.event, self.render, b, ("build",(planet,b))))
+        for b in buildings.buildings():
+            build_menu.add(menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0])[:6], ("build", (planet, b[1]))))
+          
 
-        for u in Input.units:
-            unit_menu.add(menu.Menu(u, 150, 40, self.event, self.render, u, self.event.notify("build_unit",(planet,u))))
+        for u in units.units():
+            unit_menu.add(menu.Menu(str(u[0]), 150, 40, self.event, self.render, str(u[0])[:6], ("build_unit",(planet,u[1]))))
+  
 
-
+        self.widget.add(self.widget, build_mine)
+        self.widget.add(self.widget, build_menu)
+        self.widget.add(self.widget, unit_menu)
+        self.widget.add(self.widget, transport_menu)
 
 class TextField:
     def __init__(self, text, font, width, antialias=True, foreground=(255,255,255), background=(0,0,0)):
