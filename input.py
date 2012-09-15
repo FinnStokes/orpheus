@@ -38,6 +38,7 @@ class Input:
        self.event.register("mouse_up", self.mouse_up)
        self.event.register("mouse_move", self.mouse_move)
        self.event.register("new_turn", self.new_turn)
+       self.event.register("resourceupdate", self.update_resources)
        self.scale = 1.0
        self.offset = (0,0)
        self.planets = []
@@ -52,6 +53,12 @@ class Input:
        self.turncounterrect = self.turncounter.get_rect()
        self.turncounterrect.top = self.window.get_rect().top
        self.turncounterrect.centerx = self.window.get_rect().centerx
+       self.resources = self.myfont.render("", 1, (255,255,255), (0,0,0))
+       self.resourcesrect = self.resources.get_rect()
+       self.resourcesrect.bottomright = self.window.get_rect().bottomright
+       self.hresources = self.myfont.render("", 1, (255,255,255), (0,0,0))
+       self.hresourcesrect = self.hresources.get_rect()
+       self.hresourcesrect.bottomright = self.window.get_rect().bottomright
 
     #draw interface
     def draw(self):
@@ -67,6 +74,9 @@ class Input:
             self.planettext.render(self.window)
             self.window.blit(self.planetname, self.planetnamerect)
             self.widget.draw()
+            self.window.blit(self.resources, self.resourcesrect)
+            if self.hresources:
+                self.window.blit(self.hresources, self.hresourcesrect)
         self.window.blit(self.turncounter, self.turncounterrect)
         pygame.draw.rect(self.window, (255,255,255), self.endturnbtn)
         self.render.window.blit(self.myfont.render("End Turn", 1, (0,0,0)), self.endturnbtn)
@@ -126,6 +136,30 @@ class Input:
             self.planetname = Input.myfont.render(planet.name, True, (255,255,255), (0,0,0))
             self.planetnamerect = self.planetname.get_rect()
             self.planetnamerect.bottomleft = self.planettext.rect.topleft
+            self.resources = self.myfont.render("Raw: Metal = "+str(planet.metal)+", Fuel = "+str(planet.fuel)+", Food = "+str(planet.food), 1, (255,255,255), (0,0,0))
+            self.resourcesrect = self.resources.get_rect()
+            self.resourcesrect.bottomright = self.window.get_rect().bottomright
+            if planet.colony:
+                self.hresources = self.myfont.render("Harvested: Metal = "+str(planet.colony.metal)+", Fuel = "+str(planet.colony.fuel)+", Food = "+str(planet.colony.food), 1, (255,255,255), (0,0,0))
+                self.hresourcesrect = self.hresources.get_rect()
+                self.hresourcesrect.bottomright = self.window.get_rect().bottomright
+                self.resourcesrect.bottomright = self.hresourcesrect.topright
+            else:
+                self.hresources = None
+
+    def update_resources(self,planet,resourceid,amount):
+        if self.selected and self.selected.planet == planet:
+            self.resources = self.myfont.render("Raw: Metal = "+str(planet.metal)+", Fuel = "+str(planet.fuel)+", Food = "+str(planet.food), 1, (255,255,255), (0,0,0))
+            self.resourcesrect = self.resources.get_rect()
+            self.resourcesrect.bottomright = self.window.get_rect().bottomright
+            if planet.colony:
+                self.hresources = self.myfont.render("Harvested: Metal = "+str(planet.colony.metal)+", Fuel = "+str(planet.colony.fuel)+", Food = "+str(planet.colony.food), 1, (255,255,255), (0,0,0))
+                self.hresourcesrect = self.hresources.get_rect()
+                self.hresourcesrect.bottomright = self.window.get_rect().bottomright
+                self.resourcesrect.bottomright = self.hresourcesrect.topright
+            else:
+                self.hresources = None
+            
 
     def make_planet_menu(self, planet):
         screen_width, screen_height = self.window.get_size()

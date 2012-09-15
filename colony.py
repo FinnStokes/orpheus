@@ -130,6 +130,7 @@ class BuildMine(Project):
             colony.planet.metal -= 1
             colony.metal += 1
             self._event.notify("mine_built",colony.planet)
+            self._event.notify("resourceupdate",colony.planet,"Metal",colony.planet.metal)
 
     def fail(self, colony):
         self._event.notify("mine_cancelled",colony.planet)
