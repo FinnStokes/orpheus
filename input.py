@@ -10,8 +10,9 @@ from albow.image_array import get_image_array
 from albow.dialogs import alert, ask
 
 pygame.font.init()
-myfont = pygame.font.Font("8bit_nog.ttf", 20)
-myfonts = pygame.font.Font("8bit_nog.ttf", 16)
+
+myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 20)
+myfonts = pygame.font.Font("res/fonts/8bit_nog.ttf", 16)
 
 class Input:
     def __init__(self, eventmanager, window, render):

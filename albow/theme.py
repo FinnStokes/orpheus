@@ -83,7 +83,7 @@ class Theme(object):
 
 
 root = Theme('root')
-root.font = (15, "Vera.ttf")
+root.font = (15, "8bit_nog.ttf")
 root.fg_color = (255, 255, 255)
 root.bg_color = None
 root.border_width = 0
@@ -94,7 +94,7 @@ root.RootWidget = Theme('RootWidget')
 root.RootWidget.bg_color = (0, 0, 0)
 
 root.Button = Theme('Button')
-root.Button.font = (18, "VeraBd.ttf")
+root.Button.font = (18, "8bit_nog.ttf")
 root.Button.fg_color = (255, 255, 0)
 root.Button.highlight_color = (255, 0, 0)
 root.Button.disabled_color = (64, 64, 64)
@@ -124,6 +124,6 @@ root.PaletteView.scroll_button_size = 16
 root.PaletteView.scroll_button_color = (0, 128, 255)
 
 root.TextScreen = Theme('TextScreen')
-root.TextScreen.heading_font = (24, "VeraBd.ttf")
-root.TextScreen.button_font = (18, "VeraBd.ttf")
+root.TextScreen.heading_font = (24, "8bit_nog.ttf")
+root.TextScreen.button_font = (18, "8bit_nog.ttf")
 root.TextScreen.margin = 20

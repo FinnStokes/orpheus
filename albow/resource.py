@@ -9,7 +9,7 @@ run_length_encode = False
 def find_resource_dir():
 	dir = sys.path[0]
 	while 1:
-		path = os.path.join(dir, "Resources")
+		path = os.path.join(dir, "res")
 		if os.path.exists(path):
 			return path
 		parent = os.path.dirname(dir)
@@ -52,6 +52,7 @@ def get_font(size, name):
 	font = font_cache.get(key)
 	if not font:
 		path = resource_path("fonts", name)
+		print "OUTPUT LOG "  + path
 		font = pygame.font.Font(path, size)
 		font_cache[key] = font
 	return font
