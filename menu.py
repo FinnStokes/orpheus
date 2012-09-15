@@ -37,8 +37,8 @@ class Widget:
         child.parent = parent
         parent.children.append(child)                      
  
-    def rect():
-        pygame.Rect(self.x, self.y, self.w,self.h)
+    def rect(self):
+        return pygame.Rect(self.x, self.y, self.w,self.h)
        
 
 class Menu:

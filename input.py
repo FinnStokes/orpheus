@@ -70,7 +70,7 @@ class Input:
         self.planets.append(PlanetButton(planet))
 
     def mouse_up(self,pos,button):
-        if button == 1:
+        if button == 1 and not(self.widget and self.widget.rect().collidepoint(pos)):
             if self.over:
                 self.selected = self.over
                 self.event.notify("select_planet", self.over.planet)
