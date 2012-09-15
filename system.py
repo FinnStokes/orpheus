@@ -46,8 +46,8 @@ class System:
                                  (self.star_mass / r2)**0.5 * math.fabs(1 - (2.0*r1/(r1+r2))**0.5))
                 p1.addLink(p2, int((p1.escape_fuel+transfer_cost)*10))
     
-    def update():
-        for p in planets:
+    def update(self):
+        for p in self.planets:
             p.update()
     
     def _newTerrestrialPlanet(self,r):

@@ -19,7 +19,7 @@ class Planet:
         self.food = food
         self.escape_fuel = (2*self.mass / self.planet_radius)**0.5
     
-    def update():
+    def update(self):
         if self.colony:
             self.colony.update()
     

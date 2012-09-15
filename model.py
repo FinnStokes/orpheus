@@ -12,5 +12,5 @@ class Model:
         self.system = system.System(eventmanager)
         self.event.register("new_turn", self.update)
     
-    def update():
+    def update(self):
         self.system.update()

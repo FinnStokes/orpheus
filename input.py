@@ -44,6 +44,8 @@ class Input:
        self.selected = None
        self.marker = images.marker.convert_alpha()
        self.widget = None 
+       self.endturnbtn = pygame.Rect(0,0,150,40)
+       self.endturnbtn.bottomleft = self.window.get_rect().bottomleft
 
     #draw interface
     def draw(self):
@@ -58,7 +60,9 @@ class Input:
             self.widget.update()
             self.planettext.render(self.window)
             self.window.blit(self.planetname, self.planetnamerect)
-            self.widget.draw()    
+            self.widget.draw()
+        pygame.draw.rect(self.window, (255,255,255), self.endturnbtn)
+        self.render.window.blit(self.myfont.render("End Turn", 1, (0,0,0)), self.endturnbtn)
 
     def set_scale(self, scale):
         self.scale = scale
@@ -71,7 +75,9 @@ class Input:
 
     def mouse_up(self,pos,button):
         if button == 1 and not(self.widget and self.widget.rect().collidepoint(pos)):
-            if self.over:
+            if self.endturnbtn.collidepoint(pos):
+                self.event.notify("new_turn")
+            elif self.over:
                 self.selected = self.over
                 self.event.notify("select_planet", self.over.planet)
             else:
