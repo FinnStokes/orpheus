@@ -103,7 +103,10 @@ class Input:
        self.turncounterrect = self.turncounter.get_rect()
        self.turncounterrect.top = self.window.get_rect().top
        self.turncounterrect.centerx = self.window.get_rect().centerx
-        
+       
+       if self.selected.unit == None:
+            self.transport_menu.remove(self.load_menu)
+
     def set_scale(self, scale):
         self.scale = scale
 
@@ -191,8 +194,12 @@ class Input:
         build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", (planet,),), True)
         build_menu = menu.Menu("build menu",150, 40,self.event, self.render, "BUILD", None, True)
         unit_menu = menu.Menu("unit menu", 150,40,self.event, self.render, "UNIT",None, True)
+
         self.transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
-    
+   
+         
+
+
         for b in buildings.buildings():
             build_menu.add(menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0])[:6], ("build", (planet, b[1])),comment=Input.build_comments[str(b[0])]))
         
@@ -207,10 +214,11 @@ class Input:
         self.widget.add(self.widget, build_menu)
         self.widget.add(self.widget, unit_menu)
         self.widget.add(self.widget, self.transport_menu)
-
+        
     def unit_built(self, planet, unit):
         if self.selected and self.selected.planet == planet and self.transport_menu:
-            self.transport_menu.add(menu.Menu(unit, 150, 40, self.event, self.render, unit.name, ("select_unit", (unit,))))
+            self.ship_select_menu = menu.Menu(unit, 150, 40, self.event, self.render, unit.name, ("select_unit", (unit,)))
+            self.transport_menu.add(self.ship_select_menu)
     
     def unit_destroyed(self, unit):
         if unit in self.selected.planet.colony.units():
@@ -222,7 +230,7 @@ class Input:
             self.transport_menu.remove(m)
     
     def unit_moved(self, unit, to):
-        if  self.selected and self.selected.planet == to and self.transport_menu:
+        if self.selected and self.selected.planet == to and self.transport_menu: 
             self.transport_menu.add(menu.Menu(unit, 150, 40, self.event, self.render, unit.name, ("select_unit", (unit,))))
         elif unit in self.selected.planet.colony.units():
             rem = None
@@ -234,6 +242,24 @@ class Input:
     
     def select_unit(self, unit):
         self.selected_unit = unit
+
+        self.load_menu = menu.Menu("load menu", 150, 40, self.event, self.render, "LOAD", None)
+
+        loadmetal = menu.Menu("load metal", 150, 40, self.event, self.render, "METAL", ("load", (unit, "Metal", 100)))
+        loadfuel = menu.Menu("load fuel", 150, 40, self.event, self.render, "FUEL", ("load", (unit, "Fuel", 100)))
+        loadfood = menu.Menu("load food", 150, 40, self.event, self.render, "FOOD", ("load", (unit, "Food", 100)))
+        loaddrone = menu.Menu("load drones", 150, 40, self.event, self.render, "DRONE", ("load_unit",(unit, "Drone")))
+        self.load_menu.add(loadmetal)
+        self.load_menu.add(loadfuel)
+        self.load_menu.add(loadfood)
+        self.load_menu.add(loaddrone)
+        
+       
+
+        self.transport_menu.add(self.load_menu)
+
+
+
 
 class TextField:
     def __init__(self, text, font, width, antialias=True, foreground=(255,255,255), background=(0,0,0)):
