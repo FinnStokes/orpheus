@@ -3,6 +3,7 @@ import colony
 class Planet:
     def __init__(self, eventmanager, name, description, planet_type, planet_radius, mass, orbit_radius, orbit_phase, metal, fuel, food):
         self._event = eventmanager
+        self._event.register("colonise", self.colonise)
         self.name = name
         self.description = description
         self.planet_type = planet_type
@@ -22,9 +23,12 @@ class Planet:
     
     def addLink(self, planet, fuelCost):
         self.links[planet] = fuelCost
+        self._event.notify("new_link", self, planet, fuelCost)
     
     def colonise(self):
-        colony.Colony(self._event, self)
+        if not self.colony:
+            c = colony.Colony(self._event, self)
+            self._event.notify("new_colony", c)
 
     def __str__(self):
         return "%s: %s"%(self.name,self.description)

@@ -6,6 +6,8 @@ class Colony:
             self.planet = planet
             planet.colony = self
         self._event = eventmanager
+        self._event.register("build_mine",self.handle_build_mine)
+        self._event.register("build",self.handle_build)
         self.metal = 0
         self.fuel = 0
         self.food = 0
@@ -36,6 +38,14 @@ class Colony:
         for u in self.units():
             ergs += u.production()
         return ergs
+    
+    def handle_build_mine(self, planet):
+        if planet == self.planet:
+            self.buildMine()
+
+    def handle_build(self, planet, building):
+        if planet == self.planet:
+            self.build(building)
 
     def buildMine(self):
         self.do(BuildMine(self._event))
@@ -91,11 +101,10 @@ class Project:
     
     def work(self, ergs, colony):
         if not self.okay(colony):
-            print("Project cancelled: Insufficient resources")
+            self.fail(colony)
             return True
         self.ergs -= ergs
         if self.ergs <= 0:
-            print("Project complete")
             self.done(colony)
             return True
         return False
@@ -104,6 +113,9 @@ class Project:
         return True
     
     def done(self, colony):
+        pass
+
+    def fail(self, colony):
         pass
 
 class BuildMine(Project):
@@ -117,23 +129,29 @@ class BuildMine(Project):
         if self.okay(colony):
             colony.planet.metal -= 1
             colony.metal += 1
+            self._event.notify("mine_built",colony.planet)
 
-class BuildUnit(Project):
-    def __init__(self, eventmanager, unit):
-        Project.__init__(self, eventmanager, unit.ergCost)
-        self.unit = unit
+    def fail(self, colony):
+        self._event.notify("mine_cancelled",colony.planet)
+
+# class BuildUnit(Project):
+#     def __init__(self, eventmanager, unit):
+#         Project.__init__(self, eventmanager, unit.ergCost)
+#         self.unit = unit
     
-    def okay(self, colony):
-        return (colony.metal >= self.unit.metalCost and
-                colony.fuel >= self.unit.fuelCost and
-                colony.food >= self.unit.foodCost)
+#     def okay(self, colony):
+#         return (colony.metal >= self.unit.metalCost and
+#                 colony.fuel >= self.unit.fuelCost and
+#                 colony.food >= self.unit.foodCost)
     
-    def done(self, colony):
-        if self.okay(colony):
-            colony.metal -= self.unit.metalCost
-            colony.fuel -= self.unit.fuelCost
-            colony.food -= self.unit.foodCost
-            colony.addUnit(self.unit(self._event, colony))
+#     def done(self, colony):
+#         if self.okay(colony):
+#             colony.metal -= self.unit.metalCost
+#             colony.fuel -= self.unit.fuelCost
+#             colony.food -= self.unit.foodCost
+#             u = self.unit(self._event, colony)
+#             colony.addUnit(u)
+#             self._event.notify("unit_built",colony.planet,u)
 
 class BuildBuilding(Project):
     def __init__(self, eventmanager, building):
@@ -150,4 +168,9 @@ class BuildBuilding(Project):
             colony.metal -= self.building.metalCost
             colony.fuel -= self.building.fuelCost
             colony.food -= self.building.foodCost
-            colony._buildings.append(self.building(self._event, colony))
+            b = self.building(self._event, colony)
+            colony._buildings.append(b)
+            self._event.notify("built",colony.planet,b)
+
+    def fail(self, colony):
+        self._event.notify("build_cancelled",colony.planet,b)
