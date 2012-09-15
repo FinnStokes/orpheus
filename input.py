@@ -74,7 +74,7 @@ class Input:
         if not (planet == None) and self.context == "SPACE":
             self.context = "PLANET"
             self.shell = PlanetShell(self.window, planet, self.event)
-            shell.run() 
+            self.shell.run() 
         
     #close Menu when focus 
     def close_planet_menu(self):
@@ -89,13 +89,15 @@ class PlanetShell(Shell):
         self.planet = planet
         #create menus
         self.titletext = "Planet " + planet.name
+        self.create_screens()
         self.root_screen = PlanetScreen(self, eventmanager, planet)
        #display management
         self.set_timer(50)
     
     def create_screens(self):
-        self.build_screen = BuildScreen(self)
-        self.unit_screen = UnitScreen(self)  
+        self.build_screen = BuildScreen(self, self.event, self.planet)
+        self.unit_screen = UnitScreen(self, self.event, self.planet)  
+        self.transport_screen = TransportScreen(self, self.event, self.planet)  
     
     def show_menu(self):
         self.show_screen(self.menu_screen)   
@@ -115,8 +117,8 @@ class PlanetScreen(Screen):
         title = Label(shell.titletext)
         title.font = myfont
         menu = Column([
-            screen_button("Build", shell.build_screen, enable = not (self.planet.colony == None) ),
-            screen_button("Units", shell.unit_screen, enable = not (self.planet.colony == None)),
+            screen_button("Build", shell.build_screen),#, enable = not (self.planet.colony == None) ),
+            screen_button("Units", shell.unit_screen),#, enable = not (self.planet.colony == None)),
             Button("Colonise", font = myfonts, action = self.event.notify("colonise_planet", self.planet))
         ], align='l')
         contents = Column([
@@ -131,29 +133,25 @@ class PlanetScreen(Screen):
 #UNBUILT, DISABLED or ENABLED
 class BuildScreen(Screen):
     
-    def __init__(self, shell, planet, eventmanager):
+    def __init__(self, shell, eventmanager, planet):
         Screen.__init__(self, shell.rect)
         self.shell = shell
         self.planet = planet
-        self.event = eventmaanger
+        self.event = eventmanager
     
         self.possbuilds = []
         self.buttons = []
 
-        def screen_button(text, screen):
-            return Button(text, font = myfont, action = lambda: shell.show_screen(screen))       
-    
+   
         title = Label(shell.titletext)
         
         self.buttons.append(Button("Add Mine", font = myfonts,
                                     action = self.event.notify("mine_request", self.planet.colony)));
 
-        for b in possbuilds:
+        for b in self.possbuilds:
             self.buttons.append(Button("" + b.type, font = myfonts,
                                     action = self.event.notify("building_request", self.planet.colony, b.type)))
-
-        self.buttons.append(screen_button("Back", shell.menu_screen))
-
+        self.buttons.append(Button("Back",font=myfonts, action = self.back))
         title.font = myfont
         menu = Column(self.buttons, align='l')
         contents = Column([
@@ -162,10 +160,14 @@ class BuildScreen(Screen):
         ], align = 'l', spacing = 20)
         self.center(contents)
 
+    def back(self):
+        self.parent.show_menu()
+
 #Menu displayed when adding units to a colonised planet
 #displays 
 class UnitScreen(Screen):
     def __init__(self, shell, planet, eventmanager):
+        Screen.__init__(self, shell.rect)
         self.shell = shell
         self.planet = planet
         self.event = eventmanager
@@ -176,12 +178,12 @@ class UnitScreen(Screen):
             return Button(text, font = myfont, action = lambda: shell.show_screen(screen))       
         title = Label(shell.titletext)
         title.font = myfont
-
-        self.buttons.append(screen_button("Back", shell.menu_screen))
-        
-        for u in possunits:
+      
+        for u in self.possunits:
             self.buttons.append(Button("" + u.type, font = myfonts,
                                     action = self.event.notify("unit_request", self.planet.colony, u.type)))
+  
+        self.buttons.append(Button("Back",font=myfonts, action = self.back))
       
         menu = Column(self.buttons, align='l')
         contents = Column([
@@ -189,7 +191,32 @@ class UnitScreen(Screen):
             menu,
         ], align = 'l', spacing = 20)
         self.center(contents)   
-      
+     
+    def back(self):
+        self.parent.show_menu()
+
+
+class TransportScreen(Screen):
+    def __init__(self, shell, planet, eventmanager):
+        Screen.__init__(self, shell.rect)
+        self.buttons = []
+        self.buttons.append(Button("Back",font=myfonts, action = self.back))
+ 
+
+    def ship_ready(self, ship):
+        pass
+
+    #Handles select_planet events once ship has been selected. If selected planet exists and 
+    #has a colony if ship is not settler
+    #transport is approved, this function deregistered 
+    def transport_dest_selected(self, dest):
+        pass
+
+    def back(self):
+        self.parent.show_menu()   
+
+
+
 class PlanetButton:
     earth_rad = 0.000042*500
     
