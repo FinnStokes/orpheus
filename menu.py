@@ -22,7 +22,7 @@ class Widget:
             
             if i > 0: 
                 for j in range(0, i):
-                    child.y += parent.children[j].getChildrensHeight();
+                    child.y += parent.children[j].get_childrens_height();
 
             update_pos(child);                                     
       
@@ -56,10 +56,12 @@ class Menu:
         self.font = Menu.myfont
         self.colour = colour
         self.event.register("mouse_up", self.mouse_up)              
-    
+        
         if action == None:
+            self.hasevent = False
             self.action = self.expose_children
         else:
+            self.hasevent = True
             self.action = action
            
     def update(self):
@@ -91,15 +93,24 @@ class Menu:
          
     def mouse_up(self, pos, button):
         if button == 1 and self.is_on(pos):
-            self.action()
+            if self.hasevent:
+                self.event.notify(action[0], *action[1])
+            else:
+                self.action()
+        
 
     def is_on(self, pos):
         res = (pos[0] >= self.x) and (pos[0] <= self.x + self.w)
         res = res and (pos[1] >= self.y) and (pos[1] <= self.y + self.h)        
         return res
 
-
-
+    def get_childrens_height(self):
+        parent = self
+        totalheight = parent.h
+    
+        for i in range(0, len(parent.children)):
+            totalheight += parent.children[i].get_childrens_height()
+        return totalheight
 #Root
 
 ###Description

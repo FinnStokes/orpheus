@@ -100,16 +100,16 @@ class Input:
 
     def make_planet_menu(self, planet):
         self.widget = menu.Widget(0, 0, self.event, self.render)
-        build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", self.event.notify("build_mine"), True)
+        build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", planet), True)
         build_menu = menu.Menu("build menu",150, 40,self.event, self.render, "BUILD", None, True)
         unit_menu = menu.Menu("unit menu", 150,40,self.event, self.render, "UNIT",None, True)
         transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
     
         for b in Input.builds:
-            build_menu.add(menu.Menu(b, 150, 40, self.event, self.render, b, self.event.notify("build",b)))
+            build_menu.add(menu.Menu(b, 150, 40, self.event, self.render, b, ("build",(planet,b))))
 
         for u in Input.units:
-            unit_menu.add(menu.Menu(u, 150, 40, self.event, self.render, u, self.event.notify("build_unit",u)))
+            unit_menu.add(menu.Menu(u, 150, 40, self.event, self.render, u, self.event.notify("build_unit",(planet,u))))
 
 
 
