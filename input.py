@@ -65,12 +65,13 @@ class Input:
         self.planets.append(PlanetButton(planet))
 
     def mouse_up(self,pos,button):
-        if self.over:
-            self.selected = self.over
-            self.event.notify("select_planet", self.over.planet)
-        else:
-            self.selected = None
-            self.event.notify("select_planet", None)
+        if button == 1:
+            if self.over:
+                self.selected = self.over
+                self.event.notify("select_planet", self.over.planet)
+            else:
+                self.selected = None
+                self.event.notify("select_planet", None)
 
     def mouse_move(self,pos,rel,buttons):
         world_pos = ((pos[0] - self.offset[0])/self.scale, (pos[1] - self.offset[1])/self.scale)
