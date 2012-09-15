@@ -37,6 +37,7 @@ class Input:
        self.event.register("new_planet", self.add_planet)
        self.event.register("mouse_up", self.mouse_up)
        self.event.register("mouse_move", self.mouse_move)
+       self.event.register("new_turn", self.new_turn)
        self.scale = 1.0
        self.offset = (0,0)
        self.planets = []
@@ -46,6 +47,11 @@ class Input:
        self.widget = None 
        self.endturnbtn = pygame.Rect(0,0,150,40)
        self.endturnbtn.bottomleft = self.window.get_rect().bottomleft
+       self.turn = 1
+       self.turncounter = self.myfont.render("Turn 1", 1, (255,255,255), (0,0,0))
+       self.turncounterrect = self.turncounter.get_rect()
+       self.turncounterrect.top = self.window.get_rect().top
+       self.turncounterrect.centerx = self.window.get_rect().centerx
 
     #draw interface
     def draw(self):
@@ -61,9 +67,17 @@ class Input:
             self.planettext.render(self.window)
             self.window.blit(self.planetname, self.planetnamerect)
             self.widget.draw()
+        self.window.blit(self.turncounter, self.turncounterrect)
         pygame.draw.rect(self.window, (255,255,255), self.endturnbtn)
         self.render.window.blit(self.myfont.render("End Turn", 1, (0,0,0)), self.endturnbtn)
 
+    def new_turn(self):
+       self.turn += 1
+       self.turncounter = self.myfont.render("Turn "+str(self.turn), 1, (255,255,255), (0,0,0))
+       self.turncounterrect = self.turncounter.get_rect()
+       self.turncounterrect.top = self.window.get_rect().top
+       self.turncounterrect.centerx = self.window.get_rect().centerx
+        
     def set_scale(self, scale):
         self.scale = scale
 
