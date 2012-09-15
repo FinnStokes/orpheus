@@ -31,9 +31,7 @@ function Menu(id, w, h, color) {
   this.parent = null;
   this.children = new Array();
 
-  this.update = function() {
-    // this.updatePosition();
-  };
+  this.update = function() {};
   
   this.draw = function() {
     // console.log("x: {1} y: {2} \t w: {3} h: {4} \t id: {0}".format(this.id, this.x, this.y, this.w, this.h));
@@ -47,18 +45,6 @@ function Menu(id, w, h, color) {
       this.children[i].draw();
   };
   
-  this.add = function(obj) {
-    var parent = this;
-    obj.parent = this;
-    obj.x = parent.x;
-    obj.y = parent.y + parent.h;
-
-    for (var i=0; i < parent.children.length; i++)
-      obj.y += parent.children[i].h;
-    
-    parent.children.push(obj);
-  };
-  
   this.getChildrensHeight = function() {
     var parent = this;
     var totalHeight = parent.h;
@@ -67,22 +53,6 @@ function Menu(id, w, h, color) {
       totalHeight += parent.children[i].getChildrensHeight();
     
     return totalHeight;
-  };
-  
-  this.updatePosition = function(){
-    for (var i=0; i < this.children.length; i++) {
-      var parent = this.children[i].parent;
-      var obj = this.children[i];
-      var y = parent.y + parent.h;
-      
-      obj.y = y;
-      
-      if (i > 0)
-        for (var j=0; j < i; j++)
-          obj.y += parent.children[j].getChildrensHeight();
-      
-      this.children[i].updatePosition();
-    }
   };
 
 }
@@ -96,57 +66,57 @@ function Container(x,y) {
   this.children = new Array();
   
   this.update = function() {
-    for (var i=0; i < this.children.length; i++) {
-      var parent = this.children[i].parent;
-      var obj = this.children[i];
-      var y = parent.y + parent.h;
-      
-      obj.y = y;
-      
-      if (i > 0)
-        for (var j=0; j < i; j++)
-          obj.y += parent.children[j].getChildrensHeight();
-      
-      this.children[i].updatePosition();
-    }
+    updatePositions(this);
   };
   
   this.draw = function() {
     for(var i=0; i < this.children.length; i++)
       this.children[i].draw();
   };
-    
-  this.add = function(obj) {
-    var parent = this;
-    obj.parent = this;
-    obj.x = parent.x;
-    obj.y = parent.y;
+}
 
-    for (var i=0; i < parent.children.length; i++)
-      obj.y += parent.children[i].getChildrensHeight();
+function add(parent, obj) {
+  obj.parent = parent;
+
+  parent.children.push(obj);
+  updatePositions(obj);
+};
+
+function updatePositions(obj){
+  for (var i=0; i < obj.children.length; i++) {
+    var parent = obj.children[i].parent;
+    var objChildren = obj.children[i];
+    var y = parent.y + parent.h;
     
-    parent.children.push(obj);
-  };
+    objChildren.y = y;
+    
+    if (i > 0)
+      for (var j=0; j < i; j++)
+        objChildren.y += parent.children[j].getChildrensHeight();
+    
+    updatePositions(objChildren);
+  }
 }
 
 var root = new Container(10, 20);
 
-root.add( new Menu("description", 300, 50, "red") );
+add(root, new Menu("description", 300, 50, "red") );
 
-root.children[0].add( new Menu("Child description", 300, 50, "rgba(0, 255, 0, 0.5)") );
-root.children[0].add( new Menu("Child description", 300, 50, "rgba(0, 255, 255, 0.5)") );
-root.children[0].add( new Menu("Child description", 300, 50, "rgba(255, 0, 0, 0.5)") );
+add(root.children[0], new Menu("Child description", 300, 50, "rgba(0, 255, 0, 0.5)") );
+add(root.children[0], new Menu("Child description", 300, 50, "rgba(0, 255, 255, 0.5)") );
+add(root.children[0], new Menu("Child description", 300, 50, "rgba(255, 0, 0, 0.5)") );
 
-root.add( new Menu("buildings", 300, 50, "rgba(0,50,50,0.2)") );
+add(root, new Menu("buildings", 300, 50, "red") );
 
-root.children[1].add( new Menu("Child description", 300, 50, "rgba(0, 255, 0, 0.5)") );
-root.children[1].add( new Menu("Child description", 300, 50, "rgba(0, 255, 255, 0.5)") );
-root.children[1].add( new Menu("Child description", 300, 50, "rgba(255, 0, 0, 0.5)") );
+add(root.children[1], new Menu("Child description", 300, 50, "rgba(0, 255, 0, 0.5)") );
+add(root.children[1], new Menu("Child description", 300, 50, "rgba(0, 255, 255, 0.5)") );
+add(root.children[1], new Menu("Child description", 300, 50, "rgba(255, 0, 0, 0.5)") );
 
 root.draw();
 
-root.children[0].children.splice(0, 1);
-root.children[0].children.splice(1, 1);
+// root.children[0].children.splice(0, 1);
+// root.children[0].children.splice(1, 1);
+// root.children.splice(1, 1);
 
 ctx.clearRect(0,0,1024,600);
 root.update();
