@@ -50,8 +50,9 @@ class Menu:
     pygame.font.init()
     TEXT_OFFSET = (5, 5)
     myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 18)
+    myfonts = pygame.font.Font("res/fonts/8bit_nog.ttf", 10)
  
-    def __init__(self, id, w, h, eventmanager, render, text, action, visible = False, colour = pygame.Color("white")):
+    def __init__(self, id, w, h, eventmanager, render, text, action, visible = False, comment = "", colour = pygame.Color("white")):
         self.id = id
         self.x = 0
         self.y = 0        
@@ -62,8 +63,10 @@ class Menu:
         self.render = render
         self.visible = visible
         self.text = text
+        self.comment = comment
         self.TEXT_OFFSET = Menu.TEXT_OFFSET
         self.font = Menu.myfont
+        self.font1 = Menu.myfonts
         self.colour = colour
         self.event.register("mouse_up", self.mouse_up)              
         
@@ -82,7 +85,9 @@ class Menu:
         #draw box, then text
             pygame.draw.rect(self.render.window, self.colour, (self.x, self.y, self.w, self.h))                 
             self.render.window.blit(self.font.render(self.text, 1, (0,0,0)), (self.x, self.y, self.w, self.h))
-            
+            self.render.window.blit(self.font1.render(self.comment, 1, (0,0,0)), (self.x, self.y +15, self.w, self.h))
+                
+        
         for i in range(0, len(self.children)):
             self.children[i].draw()
      
@@ -126,6 +131,7 @@ class Menu:
             if parent.children[i].visible:
                 totalheight += parent.children[i].get_childrens_height()
         return totalheight
+
 #Root
 
 ###Description
