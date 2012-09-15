@@ -8,11 +8,14 @@ def buildings():
         except TypeError: pass
 
 class Building:
+    name = "Building"
     ergCost = 10
     metalCost = 0
     foodCost = 0
     fuelCost = 0
-    def __init__(self, colony):
+
+    def __init__(self, eventmanager, colony):
+        self._event = eventmanager
         self.colony = colony
     
     def update(self, processed):
@@ -22,11 +25,12 @@ class Building:
         return 0
 
 class Manufactory(Building):
+    name = "Manufactory"
     metalCost = 2
     ergRate = 1
     
-    def __init__(self, colony):
-        Building.__init__(self, colony)
+    def __init__(self, eventmanager, colony):
+        Building.__init__(self, eventmanager, colony)
         self.ergs = 0
         self._queue = deque([])
     
@@ -54,10 +58,11 @@ class Manufactory(Building):
             self.colony.metal -= unit.metalCost
             self.colony.fuel -= unit.fuelCost
             self.colony.food -= unit.foodCost
-            self.colony.addUnit(unit(self.colony))
+            self.colony.addUnit(unit(self._event, self.colony))
     
 
 class ReclamationFacility(Building):
+    name = "Reclamation Facility"
     metalCost = 1
     def reclaim(self, unit):
         if not self.colony.hasUnit(unit):
@@ -67,6 +72,7 @@ class ReclamationFacility(Building):
         self.colony.metal += unit.metalCost
 
 class FuelExtractor(Building):
+    name = "Fuel Extractor"
     def update(self, processed):
         count = 0
         for b in processed:
@@ -79,6 +85,7 @@ class FuelExtractor(Building):
         Building.update(self, processed)
 
 class HydroponicsModule(Building):
+    name = "Hydroponics Module"
     def update(self, processed):
         count = 0
         for b in processed:

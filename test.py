@@ -4,21 +4,23 @@ import colony
 import units
 import buildings
 import math
+import event
 
 class TestColony(unittest.TestCase):
     def setUp(self):
+        self.event = event.EventManage()
         self.fuelRate = 10
         self.fuelTime = 10
         self.mineTime = 10
         self.manufactoryTime = 10
         self.reclaimTime = 10
         self.droneTime = 10
-        self.p1 = planet.Planet("Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,5,0,0)
-        self.c1 = colony.Colony(self.p1)
-        self.p2 = planet.Planet("Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,500,0)
-        self.c2 = colony.Colony(self.p2)
-        self.p3 = planet.Planet("Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,150)
-        self.c3 = colony.Colony(self.p3)
+        self.p1 = planet.Planet(self.event,"Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,5,0,0)
+        self.c1 = colony.Colony(self.event,self.p1)
+        self.p2 = planet.Planet(self.event,"Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,500,0)
+        self.c2 = colony.Colony(self.event,self.p2)
+        self.p3 = planet.Planet(self.event,"Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,150)
+        self.c3 = colony.Colony(self.event,self.p3)
         self.initial = {}
         self.store(self.c1)
         self.store(self.c2)
@@ -38,9 +40,9 @@ class TestColony(unittest.TestCase):
             self.c3.update()
     
     def test_fuel(self):
-        self.c1.build(colony.BuildBuilding(buildings.FuelExtractor))
-        self.c2.build(colony.BuildBuilding(buildings.FuelExtractor))
-        self.c3.build(colony.BuildBuilding(buildings.FuelExtractor))
+        self.c1.build(buildings.FuelExtractor)
+        self.c2.build(buildings.FuelExtractor)
+        self.c3.build(buildings.FuelExtractor)
         self.update(self.fuelTime)
         self.update(20)
         self.assertEqual(self.c1.fuel, 0)
@@ -58,9 +60,9 @@ class TestColony(unittest.TestCase):
         self.assertEqual(self.c3.fuel + self.c3.planet.fuel, self.initial[self.c3]['fuel'])
 
     def test_metal(self):
-        self.c1.build(colony.BuildMine())
-        self.c2.build(colony.BuildMine())
-        self.c3.build(colony.BuildMine())
+        self.c1.buildMine()
+        self.c2.buildMine()
+        self.c3.buildMine()
         self.update(self.mineTime)
         self.assertEqual(self.c1.metal, 1)
         self.assertEqual(self.c1.metal + self.c1.planet.metal, self.initial[self.c1]['metal'])
@@ -69,9 +71,9 @@ class TestColony(unittest.TestCase):
         self.assertEqual(self.c3.metal, 0)
         self.assertEqual(self.c3.metal + self.c3.planet.metal, self.initial[self.c3]['metal'])
         for i in range(0,5):
-            self.c1.build(colony.BuildMine())
-            self.c2.build(colony.BuildMine())
-            self.c3.build(colony.BuildMine())
+            self.c1.buildMine()
+            self.c2.buildMine()
+            self.c3.buildMine()
         self.update(5*self.mineTime)
         self.assertEqual(self.c1.metal, 5)
         self.assertEqual(self.c1.metal + self.c1.planet.metal, self.initial[self.c1]['metal'])
@@ -81,12 +83,12 @@ class TestColony(unittest.TestCase):
         self.assertEqual(self.c3.metal + self.c3.planet.metal, self.initial[self.c3]['metal'])
     
     def test_drone(self):
-        self.c1.build(colony.BuildMine())
-        self.c2.build(colony.BuildMine())
-        self.c3.build(colony.BuildMine())
-        self.c1.build(colony.BuildMine())
-        self.c2.build(colony.BuildMine())
-        self.c3.build(colony.BuildMine())
+        self.c1.buildMine()
+        self.c2.buildMine()
+        self.c3.buildMine()
+        self.c1.buildMine()
+        self.c2.buildMine()
+        self.c3.buildMine()
         self.update(self.mineTime*2)
         self.assertEqual(self.c1.metal, 2)
         self.assertEqual(self.c2.metal, 0)
@@ -94,9 +96,9 @@ class TestColony(unittest.TestCase):
         self.c1.metal += 2
         self.c2.metal += 2
         self.c3.metal += 2
-        self.c1.build(colony.BuildBuilding(buildings.Manufactory))
-        self.c2.build(colony.BuildBuilding(buildings.Manufactory))
-        self.c3.build(colony.BuildBuilding(buildings.Manufactory))
+        self.c1.build(buildings.Manufactory)
+        self.c2.build(buildings.Manufactory)
+        self.c3.build(buildings.Manufactory)
         self.update(self.manufactoryTime)
         self.assertEqual(self.c1.metal, 2)
         self.assertEqual(self.c2.metal, 0)
@@ -119,13 +121,13 @@ class TestColony(unittest.TestCase):
     
     def test_reclaim(self):
         for i in range(0,5):
-            self.c1.build(colony.BuildMine())
+            self.c1.buildMine()
             self.update(self.mineTime)
         self.assertEqual(self.c1.metal, 5)
-        self.c1.build(colony.BuildBuilding(buildings.Manufactory))
-        self.c1.build(colony.BuildBuilding(buildings.ReclamationFacility))
+        self.c1.build(buildings.Manufactory)
+        self.c1.build(buildings.ReclamationFacility)
         self.c2.metal += 1
-        self.c2.build(colony.BuildBuilding(buildings.ReclamationFacility))
+        self.c2.build(buildings.ReclamationFacility)
         self.update(self.manufactoryTime+self.reclaimTime)
         m1 = self.c1.getBuildings(buildings.Manufactory)[0]
         r1 = self.c1.getBuildings(buildings.ReclamationFacility)[0]
@@ -156,12 +158,13 @@ class TestColony(unittest.TestCase):
         
 class TestScout(unittest.TestCase):
     def setUp(self):
+        self.event = event.EventManage()
         self.scoutTime = 10
         self.manufactoryTime = 10
-        self.p1 = planet.Planet("Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
-        self.p2 = planet.Planet("Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
-        self.p3 = planet.Planet("Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
-        self.p4 = planet.Planet("Planet4","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p1 = planet.Planet(self.event,"Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p2 = planet.Planet(self.event,"Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p3 = planet.Planet(self.event,"Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p4 = planet.Planet(self.event,"Planet4","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
         self.p1.addLink(self.p2,10)
         self.p1.addLink(self.p3,10)
         self.p1.addLink(self.p4,10)
@@ -170,9 +173,9 @@ class TestScout(unittest.TestCase):
         self.p3.addLink(self.p1,50)
         self.p3.addLink(self.p2,50)
 
-        self.c1 = colony.Colony(self.p1)
-        self.c2 = colony.Colony(self.p2)
-        self.c3 = colony.Colony(self.p3)
+        self.c1 = colony.Colony(self.event,self.p1)
+        self.c2 = colony.Colony(self.event,self.p2)
+        self.c3 = colony.Colony(self.event,self.p3)
     
     def update(self, turns):
         for p in [self.p1, self.p2, self.p3]:
@@ -182,7 +185,7 @@ class TestScout(unittest.TestCase):
     
     def runTest(self):
         self.c1.metal += 3
-        self.c1.build(colony.BuildBuilding(buildings.Manufactory))
+        self.c1.build(buildings.Manufactory)
         self.update(self.manufactoryTime)
         m1 = self.c1.getBuildings(buildings.Manufactory)[0]
         m1.construct(units.Scout)
@@ -244,15 +247,16 @@ class TestScout(unittest.TestCase):
 
 class TestSettler(unittest.TestCase):
     def setUp(self):
+        self.event = event.EventManage()
         self.settlerTime = 10
         self.manufactoryTime = 10
-        self.p1 = planet.Planet("Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
-        self.p2 = planet.Planet("Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
-        self.p3 = planet.Planet("Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p1 = planet.Planet(self.event,"Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p2 = planet.Planet(self.event,"Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.p3 = planet.Planet(self.event,"Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
         self.p1.addLink(self.p2,10)
         self.p2.addLink(self.p3,10)
-        self.c1 = colony.Colony(self.p1)
-        self.c2 = colony.Colony(self.p2)
+        self.c1 = colony.Colony(self.event,self.p1)
+        self.c2 = colony.Colony(self.event,self.p2)
     
     def update(self, turns):
         for p in [self.p1, self.p2, self.p3]:
@@ -262,7 +266,7 @@ class TestSettler(unittest.TestCase):
     
     def runTest(self):
         self.c1.metal += 5
-        self.c1.build(colony.BuildBuilding(buildings.Manufactory))
+        self.c1.build(buildings.Manufactory)
         self.update(self.manufactoryTime)
         m1 = self.c1.getBuildings(buildings.Manufactory)[0]
         m1.construct(units.Settler)
@@ -298,21 +302,22 @@ class TestSettler(unittest.TestCase):
 
 class TestTransport(unittest.TestCase):
     def setUp(self):
+        self.event = event.EventManage()
         self.shipTime = 10
         self.droneTime = 10
         self.manufactoryTime = 10
-        self.p1 = planet.Planet("Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
-        self.c1 = colony.Colony(self.p1)
+        self.p1 = planet.Planet(self.event,"Planet1","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.c1 = colony.Colony(self.event,self.p1)
         self.c1.metal = 1
         self.c1.fuel = 90
         self.c1.food = 150
-        self.p2 = planet.Planet("Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
-        self.c2 = colony.Colony(self.p2)
+        self.p2 = planet.Planet(self.event,"Planet2","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.c2 = colony.Colony(self.event,self.p2)
         self.c2.metal = 0
         self.c2.fuel = 150
         self.c2.food = 0
-        self.p3 = planet.Planet("Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
-        self.c3 = colony.Colony(self.p3)
+        self.p3 = planet.Planet(self.event,"Planet3","Description","terrestrial planet",1.0,1.0,1.0,0.0,0,0,0)
+        self.c3 = colony.Colony(self.event,self.p3)
         self.c3.metal = 5
         self.c3.fuel = 70
         self.c3.food = 0
@@ -338,9 +343,9 @@ class TestTransport(unittest.TestCase):
         self.c1.metal += 2
         self.c2.metal += 2
         self.c3.metal += 2
-        self.c1.build(colony.BuildBuilding(buildings.Manufactory))
-        self.c2.build(colony.BuildBuilding(buildings.Manufactory))
-        self.c3.build(colony.BuildBuilding(buildings.Manufactory))
+        self.c1.build(buildings.Manufactory)
+        self.c2.build(buildings.Manufactory)
+        self.c3.build(buildings.Manufactory)
         self.update(self.manufactoryTime)
         m1 = self.c1.getBuildings(buildings.Manufactory)[0]
         m2 = self.c2.getBuildings(buildings.Manufactory)[0]

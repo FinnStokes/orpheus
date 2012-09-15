@@ -12,7 +12,8 @@ class Unit:
     metalCost = 0
     foodCost = 0
     fuelCost = 0
-    def __init__(self, colony):
+    def __init__(self, eventmanager, colony):
+        self._event = eventmanager
         self._colony = colony
     
     def update(self, processed):
@@ -34,8 +35,8 @@ class Drone(Unit):
 class Ship(Unit):
     fuelFactor = 1
     
-    def __init__(self, colony):
-        Unit.__init__(self, colony)
+    def __init__(self, eventmanager, colony):
+        Unit.__init__(self, eventmanager, colony)
         self._destination = None
         self._fuel = 0
     
@@ -69,8 +70,8 @@ class Transport(Ship):
     metalCost = 1
     capacity = 1
     
-    def __init__(self, colony):
-        Ship.__init__(self, colony)
+    def __init__(self, eventmanager, colony):
+        Ship.__init__(self, eventmanager, colony)
         self._payloadType = ""
         self._payload = None
         self.fuelFactor = self.capacity+1
@@ -150,7 +151,7 @@ class Settler(Ship):
     
     def update(self, processed):
         if self._destination and not self._destination.colony:
-            newColony = Colony(self._destination)
+            self._destination.colonise()
             self._fuel = 0
             self._destination = None
             self._colony.removeUnit(self)

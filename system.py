@@ -41,7 +41,7 @@ class System:
         metal = random.randint(5,7)
         fuel = random.randint(0,3)*50
         food = random.randint(13,20)*5
-        p = planet.Planet(name,description,"terrestrial planet",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
+        p = planet.Planet(self._event,name,description,"terrestrial planet",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
         self.planets.append(p)
         self._event.notify("new_planet",p)
         return orbit_radius
@@ -56,7 +56,7 @@ class System:
         metal = 0
         fuel = random.randint(6,14)*50
         food = random.randint(1,5)*5
-        p = planet.Planet(name,description,"gas giant",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
+        p = planet.Planet(self._event,name,description,"gas giant",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
         self.planets.append(p)
         self._event.notify("new_planet",p)
         return orbit_radius
@@ -81,7 +81,7 @@ class System:
         metal = random.randint(5,7)
         fuel = 0
         food = random.randint(3,10)*5
-        p = planet.Planet(name,description,"dwarf planet",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
+        p = planet.Planet(self._event,name,description,"dwarf planet",planet_radius,planet_mass,orbit_radius,orbit_phase,metal,fuel,food)
         self.planets.append(p)
         self._event.notify("new_planet",p)
     

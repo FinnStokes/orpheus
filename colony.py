@@ -1,10 +1,11 @@
 from collections import deque
 
 class Colony:
-    def __init__(self, planet):
+    def __init__(self, eventmanager, planet):
         if not planet.colony:
             self.planet = planet
             planet.colony = self
+        self._event = eventmanager
         self.metal = 0
         self.fuel = 0
         self.food = 0
@@ -36,7 +37,13 @@ class Colony:
             ergs += u.production()
         return ergs
 
-    def build(self, project):
+    def buildMine(self):
+        self.do(BuildMine(self._event))
+    
+    def build(self, building):
+        self.do(BuildBuilding(self._event,building))
+
+    def do(self, project):
         okay = project.okay(self)
         if okay:
             self.queue.append(project)
@@ -78,7 +85,8 @@ class Colony:
         return "Colony(mt=%f, fl=%f, fd=%f, pr=%f)"%(self.metal,self.fuel,self.food,self.production())
 
 class Project:
-    def __init__(self, ergs):
+    def __init__(self, eventmanager, ergs):
+        self._event = eventmanager
         self.ergs = ergs
     
     def work(self, ergs, colony):
@@ -99,8 +107,8 @@ class Project:
         pass
 
 class BuildMine(Project):
-    def __init__(self):
-        Project.__init__(self, 10)
+    def __init__(self, eventmanager):
+        Project.__init__(self, eventmanager, 10)
     
     def okay(self, colony):
         return colony.planet.metal >= 1
@@ -111,8 +119,8 @@ class BuildMine(Project):
             colony.metal += 1
 
 class BuildUnit(Project):
-    def __init__(self, unit):
-        Project.__init__(self, unit.ergCost)
+    def __init__(self, eventmanager, unit):
+        Project.__init__(self, eventmanager, unit.ergCost)
         self.unit = unit
     
     def okay(self, colony):
@@ -125,11 +133,11 @@ class BuildUnit(Project):
             colony.metal -= self.unit.metalCost
             colony.fuel -= self.unit.fuelCost
             colony.food -= self.unit.foodCost
-            colony.addUnit(self.unit(colony))
+            colony.addUnit(self.unit(self._event, colony))
 
 class BuildBuilding(Project):
-    def __init__(self, building):
-        Project.__init__(self, building.ergCost)
+    def __init__(self, eventmanager, building):
+        Project.__init__(self, eventmanager, building.ergCost)
         self.building = building
     
     def okay(self, colony):
@@ -142,4 +150,4 @@ class BuildBuilding(Project):
             colony.metal -= self.building.metalCost
             colony.fuel -= self.building.fuelCost
             colony.food -= self.building.foodCost
-            colony._buildings.append(self.building(colony))
+            colony._buildings.append(self.building(self._event, colony))

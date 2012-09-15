@@ -1,5 +1,8 @@
+import colony
+
 class Planet:
-    def __init__(self, name, description, planet_type, planet_radius, mass, orbit_radius, orbit_phase, metal, fuel, food):
+    def __init__(self, eventmanager, name, description, planet_type, planet_radius, mass, orbit_radius, orbit_phase, metal, fuel, food):
+        self._event = eventmanager
         self.name = name
         self.description = description
         self.planet_type = planet_type
@@ -19,6 +22,9 @@ class Planet:
     
     def addLink(self, planet, fuelCost):
         self.links[planet] = fuelCost
+    
+    def colonise(self):
+        colony.Colony(self._event, self)
 
     def __str__(self):
         return "%s: %s"%(self.name,self.description)
