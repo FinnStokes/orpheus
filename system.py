@@ -5,8 +5,14 @@ import planet
 import math
 import event
 
-NAMES = ['Salve', 'Servi', 'Inanis', 'Censeo', 'Imaginibus', 'Deletis', 'Miseriam', 'Mundo', 'Fertote', 'Stulti',
-         'Utinam', 'Phantasias', 'Procausa', 'Superandi', 'Desistatis']
+NAMES = [ 'Quo', 'Usque', 'Tandem', 'Abutere', 'Catilina', 'Patientia', 'Nostra', 'Quam', 'Diu', 'Etiam', 'Furor',
+'Iste', 'Tuus', 'Nos', 'Eludet', 'Quem', 'Ad', 'Finem', 'Sese', 'Effrenata', 'Iactabit', 'Audacia', 'Nihilne',
+ 'Te', 'Nocturnum', 'Praesidium', 'Palati', 'Nihil', 'Urbis', 'Vigiliae', 'Nihil', 'Timor', 'Populi', 'Concursus',
+'Bonorum', 'Omnium', 'Hic', 'Munitissimus', 'Habendi', 'Senatus', 'Locus', 'Horum', 'Ora', 'Voltusque', 'Moverunt', 'Patere', 'Tua', 'Consilia', 'Non', 'Sentis', 'Constrictam', 'Iam', 'Scientia', 'Teneri', 'Coniurationem',
+'Tuam', 'Vides', 'Quid', 'Proxima', 'Superiore', 'Nocte', 'Egeris', 'Ubi', 'Fueris', 'Quos', 'Convocaveris', 'Consilii', 'Ceperis', 'Quem', 'Nostrum', 'Ignorare', 'Arbitraris'
+]
+
+
 
 class System:
     def __init__(self, eventmanager, seed):
