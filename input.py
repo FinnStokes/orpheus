@@ -81,6 +81,9 @@ class Input:
             x = self.over.x*self.scale + self.offset[0] - self.marker.get_width()/2
             y = self.over.y*self.scale + self.offset[1] - self.marker.get_height()/2
             self.window.blit(self.marker,(int(x),int(y)))
+            if self.selected_unit:
+                cost = self.selected_unit._colony.costTo(self.over.planet)
+                self.render.window.blit(self.myfont.render(str(cost*self.selected_unit.fuelFactor), 1, (255,255,255),(0,0,0)), (int(x) + self.marker.get_width() + 10, int(y) + self.marker.get_height()/2 - 10))
         if self.selected:
             x = self.selected.x*self.scale + self.offset[0] - self.marker.get_width()/2
             y = self.selected.y*self.scale + self.offset[1] - self.marker.get_height()/2
