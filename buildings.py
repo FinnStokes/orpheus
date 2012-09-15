@@ -31,8 +31,14 @@ class Manufactory(Building):
     
     def __init__(self, eventmanager, colony):
         Building.__init__(self, eventmanager, colony)
+        self._event = eventmanager
+        self._event.register("build_unit", self.handle_build)
         self.ergs = 0
         self._queue = deque([])
+    
+    def handle_build(self, planet, unit):
+        if planet == self.colony.planet:
+            self.construct(unit)
     
     def construct(self, unit):
         if self.okay(unit):
@@ -58,18 +64,38 @@ class Manufactory(Building):
             self.colony.metal -= unit.metalCost
             self.colony.fuel -= unit.fuelCost
             self.colony.food -= unit.foodCost
-            self.colony.addUnit(unit(self._event, self.colony))
+            if unit.metalCost != 0:
+                self._event.notify("resourceupdate", self.colony.planet, "metal", self.colony.metal)
+            if unit.fuelCost != 0:
+                self._event.notify("resourceupdate", self.colony.planet, "fuel", self.colony.fuel)
+            if unit.foodCost != 0:
+                self._event.notify("resourceupdate", self.colony.planet, "food", self.colony.food)
+            u = unit(self._event, self.colony)
+            self.colony.addUnit(u)
+            self._event.notify("unit_built", self.colony.planet, u)
     
 
 class ReclamationFacility(Building):
     name = "Reclamation Facility"
     metalCost = 1
+    
+    def __init__(self, eventmanager, colony):
+        Building.__init__(self, eventmanager, colony)
+        self._event = eventmanager
+        self._event.register("reclaim_unit", self.handle_reclaim)
+    
+    def handle_reclaim(self, unit):
+        if self.colony.hasUnit(unit):
+            self.reclaim(unit)
+
     def reclaim(self, unit):
         if not self.colony.hasUnit(unit):
             print("Unable to reclaim unit: unit not present")
             return
         self.colony.removeUnit(unit)
         self.colony.metal += unit.metalCost
+        self._event.notify("unit_destroyed", unit)
+        self._event.notify("resourceupdate", self.colony.planet, "metal", self.colony.metal)
 
 class FuelExtractor(Building):
     name = "Fuel Extractor"
@@ -82,6 +108,7 @@ class FuelExtractor(Building):
             amount = min(10 - 2*count, self.colony.planet.fuel)
             self.colony.planet.fuel -= amount
             self.colony.fuel += amount
+            self._event.notify("resourceupdate", self.colony.planet, "fuel", self.colony.fuel)
         Building.update(self, processed)
 
 class HydroponicsModule(Building):
@@ -94,6 +121,7 @@ class HydroponicsModule(Building):
         if count < 5:
             amount = 10 - 2*count*self.colony.planet.food
             self.colony.food += amount
+            self._event.notify("resourceupdate", self.colony.planet, "food", self.colony.food)
         Building.update(self, processed)
 
 # class FuelStorage(Building):

@@ -46,6 +46,7 @@ class Ship(Unit):
     def update(self, processed):
         if self._destination:
             if self._destination.colony:
+                self._event.notify("unit_moved", self, self._destination)
                 self._fuel = 0
                 self._colony.removeUnit(self)
                 self._colony = self._destination.colony
@@ -84,13 +85,18 @@ class Transport(Ship):
     def unload(self):
         if self._payloadType == "Metal":
             self._colony.metal += self._payload
+            self._event.notify("resourceupdate", self._colony.planet, "metal", self._colony.metal)
         elif self._payloadType == "Food":
             self._colony.food += self._payload
+            self._event.notify("resourceupdate", self._colony.planet, "food", self._colony.food)
         elif self._payloadType == "Fuel":
             self._colony.fuel += self._payload
+            self._event.notify("resourceupdate", self._colony.planet, "fuel", self._colony.fuel)
         elif self._payloadType == "Units":
             for u in self._payload:
                 self._colony.addUnit(u)
+                u._colony = self._colony
+                self._event.notify("unit_moved", u, self._colony.planet)
         self._payloadType = ""
         self._payload = None
     
@@ -104,6 +110,7 @@ class Transport(Ship):
         self._payloadType = "Metal"
         self._payload = amount
         self._colony.metal -= amount
+        self._event.notify("resourceupdate", self._colony.planet, "metal", self._colony.metal)
 
     def loadFood(self, amount):
         if self._payloadType:
@@ -115,6 +122,7 @@ class Transport(Ship):
         self._payloadType = "Food"
         self._payload = amount
         self._colony.food -= amount
+        self._event.notify("resourceupdate", self._colony.planet, "food", self._colony.food)
 
     def loadFuel(self, amount):
         if self._payloadType:
@@ -126,6 +134,7 @@ class Transport(Ship):
         self._payloadType = "Fuel"
         self._payload = amount
         self._colony.fuel -= amount
+        self._event.notify("resourceupdate", self._colony.planet, "fuel", self._colony.fuel)
         
     def loadUnit(self, unit):
         if self._payloadType and self._payloadType != "Units":
@@ -144,6 +153,7 @@ class Transport(Ship):
             return
         self._payload.append(unit)
         self._colony.removeUnit(unit)
+        self._event.notify("unit_moved", unit, None)
 
 class Settler(Ship):
     metalCost = 2
@@ -155,6 +165,7 @@ class Settler(Ship):
             self._fuel = 0
             self._destination = None
             self._colony.removeUnit(self)
+            self._event.notify("unit_destroyed", self)
         else:
             Ship.update(self, processed)
 
