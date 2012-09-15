@@ -40,6 +40,6 @@ class AudioManage:
     def sound_on_unit(self, project):
         AudioManage.unit_barks[project.name].play()
      
-    def sound_on_mine(self):
-        AudioManage.mine_bark.play()
- 
+    def sound_on_mine(self, project):
+        AudioManage.mine_bark.play() 
+           
