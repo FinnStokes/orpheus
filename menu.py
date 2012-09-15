@@ -8,6 +8,7 @@ class Widget:
         self.h = 0
         self.children = []
         self.event = eventmanager
+        self.event.register("update_widget", self.update)
 
     def update(self):
         self.update_pos(self)   
@@ -35,7 +36,10 @@ class Widget:
     def add(self, parent, child):
         child.parent = parent
         parent.children.append(child)                      
-        
+ 
+    def rect():
+        pygame.Rect(self.x, self.y, self.w,self.h)
+       
 
 class Menu:
 
@@ -85,13 +89,13 @@ class Menu:
         for c in range(0, len(self.children)):
             self.children[c].visible = True   
         self.action = self.hide_children
-    
+        self.event.notify("update_widget")
 
     def hide_children(self):
         for c in range(0, len(self.children)):
             self.children[c].visible = False
         self.action = self.expose_children
-
+        self.event.notify("update_widget")
          
     def mouse_up(self, pos, button):
         if button == 1 and self.is_on(pos):
