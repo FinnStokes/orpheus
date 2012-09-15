@@ -15,6 +15,8 @@ NAMES = [ 'Quo', 'Usque', 'Tandem', 'Abutere', 'Catilina', 'Patientia', 'Nostra'
 
 
 class System:
+    star_mass = 14
+    
     def __init__(self, eventmanager, seed):
         random.seed(seed)
         self._event = eventmanager
@@ -32,6 +34,14 @@ class System:
         nOuter = random.randint(3,6)
         for i in range(0,nOuter):
             r = self._newGasPlanet(r)
+        
+        for p1 in self.planets:
+            for p2 in self.planets:
+                r1 = p1.orbit_radius
+                r2 = p2.orbit_radius
+                transfer_cost = ((self.star_mass / r1)**0.5 * math.fabs((2.0*r2/(r1+r2))**0.5 - 1) +
+                                 (self.star_mass / r2)**0.5 * math.fabs(1 - (2.0*r1/(r1+r2))**0.5))
+                p1.addLink(p2, int((p1.escape_fuel+transfer_cost)*10))
     
     def update():
         for p in planets:
