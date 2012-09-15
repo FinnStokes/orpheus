@@ -57,6 +57,7 @@ class Input:
             self.window.blit(self.marker,(int(x),int(y)))
             self.widget.update()
             self.planettext.render(self.window)
+            self.window.blit(self.planetname, self.planetnamerect)
             self.widget.draw()    
 
     def set_scale(self, scale):
@@ -98,9 +99,13 @@ class Input:
  
     def show_planet_desc(self, planet):
         if planet:
-            self.planettext = TextField(planet.description, Input.myfonts, 500)
-            self.planettext.centerx = self.window.get_rect().centerx
-            self.planettext.centery = self.window.get_rect().centery
+            window_rect = self.window.get_rect()
+            self.planettext = TextField(planet.description, Input.myfonts, 300)
+            self.planettext.rect.top = 30
+            self.planettext.rect.right = window_rect.right
+            self.planetname = Input.myfont.render(planet.name, True, (255,255,255), (0,0,0))
+            self.planetnamerect = self.planetname.get_rect()
+            self.planetnamerect.bottomleft = self.planettext.rect.topleft
 
     def make_planet_menu(self, planet):
         self.widget = menu.Widget(0, 0, self.event, self.render)
@@ -127,28 +132,25 @@ class TextField:
         words = text.split(" ")
         line = ""
         self.lines = []
-        self.width = width
-        self.height = 0
+        self.rect = pygame.Rect(0,0,width,0)
         for word in words:
             new_line = line + word + " "
             (w, h) = font.size(new_line)
             if w > width:
-                rect = pygame.Rect(0,self.height,w,h)
-                self.height += h
+                rect = pygame.Rect(0,self.rect.height,w,h)
+                self.rect.height += h
                 self.lines.append((font.render(line, antialias, foreground, background),rect))
                 line = word + " "
             else:
                 line = new_line
-        rect = pygame.Rect(0,self.height,w,h)
-        self.height += h
+        rect = pygame.Rect(0,self.rect.height,w,h)
+        self.rect.height += h
         self.lines.append((font.render(line, antialias, foreground, background),rect))
-        self.centerx = 0
-        self.centery = 0
         
     def render(self,window):
         for line in self.lines:
             rect = line[1]
-            window.blit(line[0], pygame.Rect(rect.x - self.width/2 + self.centerx, rect.y - self.height/2 + self.centery, rect.width, rect.height))
+            window.blit(line[0], pygame.Rect(rect.x + self.rect.left, rect.y + self.rect.top, rect.width, rect.height))
     
 class PlanetButton:
     earth_rad = 0.000042*500
