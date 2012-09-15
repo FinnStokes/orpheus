@@ -114,15 +114,18 @@ class Input:
             self.planetnamerect.bottomleft = self.planettext.rect.topleft
 
     def make_planet_menu(self, planet):
+        screen_width, screen_height = self.window.get_size()
+
         self.widget = menu.Widget(0, 0, self.event, self.render)
-        build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", (planet)), True)
+        self.widget.setrect(150, screen_height)
+        build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", (planet,),), True)
         build_menu = menu.Menu("build menu",150, 40,self.event, self.render, "BUILD", None, True)
         unit_menu = menu.Menu("unit menu", 150,40,self.event, self.render, "UNIT",None, True)
         transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
     
         for b in buildings.buildings():
             build_menu.add(menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0])[:6], ("build", (planet, b[1]))))
-          
+        
 
         for u in units.units():
             unit_menu.add(menu.Menu(str(u[0]), 150, 40, self.event, self.render, str(u[0])[:6], ("build_unit",(planet,u[1]))))
