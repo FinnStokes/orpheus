@@ -84,8 +84,8 @@ class Menu:
         if self.visible:
         #draw box, then text
             pygame.draw.rect(self.render.window, self.colour, (self.x, self.y, self.w, self.h))                 
-            self.render.window.blit(self.font.render(self.text, 1, (0,0,0)), (self.x, self.y, self.w, self.h))
-            self.render.window.blit(self.font1.render(self.comment, 1, (0,0,0)), (self.x, self.y +15, self.w, self.h))
+            self.render.window.blit(self.font.render(self.text, 1, (0,0,0)), (self.x+10, self.y+10, self.w, self.h))
+            self.render.window.blit(self.font1.render(self.comment, 1, (0,0,0)), (self.x+10, self.y +30, self.w, self.h))
                 
         
         for i in range(0, len(self.children)):
