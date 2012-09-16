@@ -74,6 +74,7 @@ class Input:
        self.hresourcesrect = self.hresources.get_rect()
        self.hresourcesrect.bottomright = self.window.get_rect().bottomright
        self.selected_unit = None
+       self.load_menu = None
 
     #draw interface
     def draw(self):
@@ -107,8 +108,9 @@ class Input:
        self.turncounterrect.top = self.window.get_rect().top
        self.turncounterrect.centerx = self.window.get_rect().centerx
        
-       if self.selected.unit == None:
+       if self.selected_unit == None and self.load_menu:
             self.transport_menu.remove(self.load_menu)
+            self.load_menu = None
 
     def set_scale(self, scale):
         self.scale = scale
@@ -247,7 +249,7 @@ class Input:
     def select_unit(self, unit):
         self.selected_unit = unit
 
-        self.load_menu = menu.Menu("load menu", 150, 40, self.event, self.render, "LOAD", None)
+        self.load_menu = menu.Menu("load menu", 150, 40, self.event, self.render, "LOAD", None, visible = True)
 
         loadmetal = menu.Menu("load metal", 150, 40, self.event, self.render, "METAL", ("load", (unit, "Metal", 100)))
         loadfuel = menu.Menu("load fuel", 150, 40, self.event, self.render, "FUEL", ("load", (unit, "Fuel", 100)))
@@ -257,12 +259,8 @@ class Input:
         self.load_menu.add(loadfuel)
         self.load_menu.add(loadfood)
         self.load_menu.add(loaddrone)
-        
-       
 
         self.transport_menu.add(self.load_menu)
-
-
 
 
 class TextField:
