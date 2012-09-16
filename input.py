@@ -98,8 +98,15 @@ class Input:
             if self.hresources:
                 self.window.blit(self.hresources, self.hresourcesrect)
         self.window.blit(self.turncounter, self.turncounterrect)
+        
+        #Draw end turn button
         pygame.draw.rect(self.window, (255,255,255), self.endturnbtn)
-        self.render.window.blit(self.myfont.render("End Turn", 1, (0,0,0)), self.endturnbtn)
+        
+        #Offset the text a little
+        textOffset = pygame.Rect(self.endturnbtn.left+10, self.endturnbtn.top+10, self.endturnbtn.width, self.endturnbtn.height)
+        
+        #Draw text on End turn button
+        self.render.window.blit(self.myfont.render("End Turn", 1, (0,0,0)), textOffset)
 
     def new_turn(self):
        self.turn += 1
@@ -204,17 +211,25 @@ class Input:
         self.transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
    
          
-
-
-        for b in buildings.buildings():
-            build_menu.add(menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0])[:6], ("build", (planet, b[1])),comment=Input.build_comments[str(b[0])]))
+        childColor = pygame.Color("grey")
         
+        for b in buildings.buildings():
+            newmenu = menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0])[:6], ("build", (planet, b[1])),comment=Input.build_comments[str(b[0])])
+            newmenu.colour = childColor;
+            newmenu.originalColour = childColor;
+            build_menu.add(newmenu)
 
         for u in units.units():
-            unit_menu.add(menu.Menu(str(u[0]), 150, 40, self.event, self.render, str(u[0])[:6], ("build_unit",(planet,u[1])),comment=Input.unit_comments[str(u[0])]))
+            newmenu = menu.Menu(str(u[0]), 150, 40, self.event, self.render, str(u[0])[:6], ("build_unit",(planet,u[1])),comment=Input.unit_comments[str(u[0])])
+            newmenu.colour = childColor;
+            newmenu.originalColour = childColor;
+            unit_menu.add(newmenu)
 
         for u in planet.colony.units():
-            self.transport_menu.add(menu.Menu(u, 150, 40, self.event, self.render, u.name, ("select_unit", (u,))))
+            newmenu = menu.Menu(u, 150, 40, self.event, self.render, u.name, ("select_unit", (u,)))
+            newmenu.colour = childColor;
+            newmenu.originalColour = childColor;
+            self.transport_menu.add(newmenu)
 
         self.widget.add(self.widget, build_mine)
         self.widget.add(self.widget, build_menu)
