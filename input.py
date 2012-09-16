@@ -97,6 +97,8 @@ class Input:
             if self.hresources:
                 self.window.blit(self.hresources, self.hresourcesrect)
         self.window.blit(self.turncounter, self.turncounterrect)
+        
+        #Draw end turn button
         pygame.draw.rect(self.window, (255,255,255), self.endturnbtn)
         
         #Offset the text a little
@@ -212,16 +214,19 @@ class Input:
         for b in buildings.buildings():
             newmenu = menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0])[:6], ("build", (planet, b[1])),comment=Input.build_comments[str(b[0])])
             newmenu.colour = childColor;
+            newmenu.originalColour = childColor;
             build_menu.add(newmenu)
 
         for u in units.units():
             newmenu = menu.Menu(str(u[0]), 150, 40, self.event, self.render, str(u[0])[:6], ("build_unit",(planet,u[1])),comment=Input.unit_comments[str(u[0])])
             newmenu.colour = childColor;
+            newmenu.originalColour = childColor;
             unit_menu.add(newmenu)
 
         for u in planet.colony.units():
             newmenu = menu.Menu(u, 150, 40, self.event, self.render, u.name, ("select_unit", (u,)))
             newmenu.colour = childColor;
+            newmenu.originalColour = childColor;
             self.transport_menu.add(newmenu)
 
         self.widget.add(self.widget, build_mine)

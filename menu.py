@@ -68,7 +68,10 @@ class Menu:
         self.font = Menu.myfont
         self.font1 = Menu.myfonts
         self.colour = colour
+        self.originalColour = colour
+        self.highlightColour = pygame.Color(0, 255, 0, 1)
         self.event.register("mouse_up", self.mouse_up)              
+        self.event.register("mouse_move", self.mouse_move)              
         
         if action == None:
             self.hasevent = False
@@ -121,7 +124,11 @@ class Menu:
                 self.event.notify(self.action[0], *self.action[1])                   
             else:
                 self.action()
-        
+    def mouse_move(self,pos,rel,buttons):
+        if self.is_on(pos):
+          self.colour = self.highlightColour
+        else:
+          self.colour = self.originalColour
 
     def is_on(self, pos):
         res = (pos[0] >= self.x) and (pos[0] <= self.x + self.w)
