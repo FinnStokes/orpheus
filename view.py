@@ -7,7 +7,7 @@ from pygame.locals import *
 
 class View:
     myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 150)
-    
+
     def __init__(self, eventmanager, window):
         self.event = eventmanager
         self.event.register("update", self.update)

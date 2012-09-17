@@ -38,7 +38,7 @@ class Orpheus(Unit):
     metalCost = 20
     fuelCost = 1000
     foodCost = 1000
-    name = "Orpheus"
+    name = "The Orpheus"
     def __init__(self, eventmanager, colony):
         Unit.__init__(self, eventmanager, colony)
         self._event.notify("win")

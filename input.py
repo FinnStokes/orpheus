@@ -23,7 +23,7 @@ class Input:
     build_comments = {"Hydroponics":"",
                       "Factory": "2 metal",
                       "Reclamation":"1 metal",
-                      "Fuel Extractor":""                     
+                      "FuelExtractor":""                     
 
     }
     unit_comments = { "Orpheus":"20 metal, 1k fuel, 1k food",
@@ -213,7 +213,7 @@ class Input:
         
         for b in buildings.buildings():
             title = b[1].name
-            comment = Input.build_comments[str(b[1].name)]
+            comment = Input.build_comments[str(b[0])]
             newmenu = menu.Menu(str(b[0]), submenuWidth, 40, self.event, self.render, title, ("build", (planet, b[1])),comment=comment)
             newmenu.colour = childColor;
             newmenu.originalColour = childColor;
@@ -221,7 +221,7 @@ class Input:
 
         for u in units.units():
             title = str(u[1].name) #str(u[0])[:6]
-            comment = Input.unit_comments[str(u[1].name)]
+            comment = Input.unit_comments[str(u[0])]
             newmenu = menu.Menu(str(u[0]), submenuWidth, 40, self.event, self.render, title, ("build_unit",(planet, u[1])), comment=comment)
             newmenu.colour = childColor;
             newmenu.originalColour = childColor;
