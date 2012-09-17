@@ -24,8 +24,8 @@ class Building:
     def production(self):
         return 0
 
-class Manufactory(Building):
-    name = "Manufactory"
+class Factory(Building):
+    name = "Factory"
     metalCost = 2
     ergRate = 1
     
@@ -76,8 +76,8 @@ class Manufactory(Building):
             self._event.notify("unit_built", self.colony.planet, u)
     
 
-class ReclamationFacility(Building):
-    name = "Reclamation Facility"
+class Reclamation(Building):
+    name = "Reclamation"
     metalCost = 1
     
     def __init__(self, eventmanager, colony):
@@ -112,12 +112,12 @@ class FuelExtractor(Building):
             self._event.notify("resourceupdate", self.colony.planet, "fuel", self.colony.fuel)
         Building.update(self, processed)
 
-class HydroponicsModule(Building):
-    name = "Hydroponics Module"
+class Hydroponics(Building):
+    name = "Hydroponics"
     def update(self, processed):
         count = 0
         for b in processed:
-            if isinstance(b,HydroponicsModule):
+            if isinstance(b,Hydroponics):
                 count += 1
         if count < 5:
             amount = 10 - 2*count*self.colony.planet.food

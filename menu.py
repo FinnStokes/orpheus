@@ -18,8 +18,10 @@ class Widget:
             parent = obj.children[i].parent           
             child = obj.children[i]
             
+            x = parent.x
             y = parent.y + parent.h 
             
+            child.x = x
             child.y = y
             
             if i > 0: 
@@ -51,7 +53,6 @@ class Menu:
     TEXT_OFFSET = (5, 5)
     typeStyleTitle = pygame.font.Font("res/fonts/8bit_nog.ttf", 20)
     typeStyleComment = pygame.font.Font(None, 20)
-    # typeStyleComment = pygame.font.Font("res/fonts/8bit_nog.ttf", 10)
  
     def __init__(self, id, w, h, eventmanager, render, text, action, visible = False, comment = "", colour = pygame.Color("white")):
         self.id = id
@@ -68,17 +69,18 @@ class Menu:
         self.TEXT_OFFSET = Menu.TEXT_OFFSET
         self.fontTitle = Menu.typeStyleTitle
         self.fontComment = Menu.typeStyleComment
+        self.lineHeight = 15
         self.colour = colour
         self.originalColour = colour
         self.highlightColour = pygame.Color(0, 255, 0, 1)
         self.event.register("mouse_up", self.mouse_up)              
         self.event.register("mouse_move", self.mouse_move)              
         
-        
         # Increase height to account for multiple line comments
         self.lineCount = self.comment.count(",")
-        self.lineHeight = 15
-        self.h += (self.lineCount * self.lineHeight) + self.lineHeight;
+
+        if self.comment != "":
+          self.h += (self.lineCount * self.lineHeight) + self.lineHeight
         
         if action == None:
             self.hasevent = False
@@ -100,7 +102,7 @@ class Menu:
             titleX = self.x + xSpacing
             titleY = self.y + ySpacing
             
-            pygame.draw.rect(self.render.window, self.colour, (self.x, self.y, self.w, self.h))                 
+            pygame.draw.rect(self.render.window, self.colour, (self.x, self.y, self.w, self.h))
             
             # Render Menu Title
             self.render.window.blit(self.fontTitle.render(self.text, 1, (0,0,0)), (titleX, titleY, self.w, self.h))

@@ -4,35 +4,32 @@ import menu
 import buildings
 import units
 from pygame.locals import *
-#from albow.widget import Widget
-#from albow.controls import Label, Button, TextField, Column, Image
-#from albow.shell import Shell, Screen, TextScreen
-#from albow.grid_view import GridView
-#from albow.palette_view import PaletteView
-#from albow.image_array import get_image_array
-#from albow.dialogs import alert, ask
-#
+
+padding = 10
+menuWidth = 150
+submenuWidth = 200
+
 pygame.font.init()
 
 
 class Input:
     myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 20)
     myfonts = pygame.font.Font("res/fonts/8bit_nog.ttf", 16)
-    builds = ["Manufactory",
+    builds = ["Factory",
               "Reclaim",
               "Fuel Extract",
               "Hydroponics"]
     
-    build_comments = {"HydroponicsModule":"",
-                      "Manufactory": "2 metal",
-                      "ReclamationFacility":"1 metal",
-                      "FuelExtractor":""                     
+    build_comments = {"Hydroponics":"",
+                      "Factory": "2 metal",
+                      "Reclamation":"1 metal",
+                      "Fuel Extractor":""                     
 
     }
     unit_comments = { "Orpheus":"20 metal, 1k fuel, 1k food",
                       "Drone": "1 metal",  
                       "Transport": "expends fuel",
-                       "Settler": "expends fuel"   }
+                      "Settler": "expends fuel"   }
     units = ["Drone",
              "Transport",
             "Settler"
@@ -60,8 +57,9 @@ class Input:
        self.selected = None
        self.marker = images.marker.convert_alpha()
        self.widget = None 
-       self.endturnbtn = pygame.Rect(0,0,150,40)
-       self.endturnbtn.bottomleft = self.window.get_rect().bottomleft
+       self.endturnbtn = pygame.Rect(10,10,150,40)
+       self.endturnbtn.left = self.window.get_rect().left + padding
+       self.endturnbtn.top = self.window.get_rect().bottom - self.endturnbtn.h - padding
        self.turn = 1
        self.turncounter = self.myfont.render("Turn 1", 1, (255,255,255), (0,0,0))
        self.turncounterrect = self.turncounter.get_rect()
@@ -202,31 +200,35 @@ class Input:
     def make_planet_menu(self, planet):
         screen_width, screen_height = self.window.get_size()
 
-        self.widget = menu.Widget(0, 0, self.event, self.render)
-        self.widget.setrect(150, screen_height-40)
-        build_mine = menu.Menu("build mine", 150, 40, self.event, self.render, "MINE", ("build_mine", (planet,),), True)
-        build_menu = menu.Menu("build menu",150, 40,self.event, self.render, "BUILD", None, True)
-        unit_menu = menu.Menu("unit menu", 150,40,self.event, self.render, "UNIT",None, True)
+        self.widget = menu.Widget(padding, padding, self.event, self.render)
+        self.widget.setrect(menuWidth, screen_height-40)
+        build_mine = menu.Menu("build mine", menuWidth, 40, self.event, self.render, "MINE", ("build_mine", (planet,),), True)
+        build_menu = menu.Menu("build menu",menuWidth, 40,self.event, self.render, "BUILD", None, True)
+        unit_menu = menu.Menu("unit menu", menuWidth, 40,self.event, self.render, "UNIT",None, True)
 
-        self.transport_menu = menu.Menu("transport menu", 150, 40, self.event, self.render, "TRANSPORT", None, True)      
+        self.transport_menu = menu.Menu("transport menu", menuWidth, 40, self.event, self.render, "TRANSPORT", None, True)      
    
          
         childColor = pygame.Color("grey")
         
         for b in buildings.buildings():
-            newmenu = menu.Menu(str(b[0]), 150, 40, self.event, self.render, str(b[0])[:6], ("build", (planet, b[1])),comment=Input.build_comments[str(b[0])])
+            title = b[1].name
+            comment = Input.build_comments[str(b[1].name)]
+            newmenu = menu.Menu(str(b[0]), submenuWidth, 40, self.event, self.render, title, ("build", (planet, b[1])),comment=comment)
             newmenu.colour = childColor;
             newmenu.originalColour = childColor;
             build_menu.add(newmenu)
 
         for u in units.units():
-            newmenu = menu.Menu( str(u[0]), 150, 40, self.event, self.render, str(u[0])[:6], ("build_unit",(planet,u[1])), comment=Input.unit_comments[str(u[0])] )
+            title = str(u[1].name) #str(u[0])[:6]
+            comment = Input.unit_comments[str(u[1].name)]
+            newmenu = menu.Menu(str(u[0]), submenuWidth, 40, self.event, self.render, title, ("build_unit",(planet, u[1])), comment=comment)
             newmenu.colour = childColor;
             newmenu.originalColour = childColor;
             unit_menu.add(newmenu)
 
         for u in planet.colony.units():
-            newmenu = menu.Menu(u, 150, 40, self.event, self.render, u.name, ("select_unit", (u,)))
+            newmenu = menu.Menu(u, submenuWidth, 40, self.event, self.render, u.name, ("select_unit", (u,)))
             newmenu.colour = childColor;
             newmenu.originalColour = childColor;
             self.transport_menu.add(newmenu)
