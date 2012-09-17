@@ -220,7 +220,7 @@ class Input:
             build_menu.add(newmenu)
 
         for u in units.units():
-            newmenu = menu.Menu(str(u[0]), 150, 40, self.event, self.render, str(u[0])[:6], ("build_unit",(planet,u[1])),comment=Input.unit_comments[str(u[0])])
+            newmenu = menu.Menu( str(u[0]), 150, 40, self.event, self.render, str(u[0])[:6], ("build_unit",(planet,u[1])), comment=Input.unit_comments[str(u[0])] )
             newmenu.colour = childColor;
             newmenu.originalColour = childColor;
             unit_menu.add(newmenu)

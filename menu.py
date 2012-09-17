@@ -73,6 +73,10 @@ class Menu:
         self.event.register("mouse_up", self.mouse_up)              
         self.event.register("mouse_move", self.mouse_move)              
         
+        #Check length of comment, add new lines if necessary, increase height
+        self.lineCount = self.comment.count(",")
+        self.h += self.lineCount*10;
+        
         if action == None:
             self.hasevent = False
             self.action = self.expose_children
@@ -88,9 +92,14 @@ class Menu:
         #draw box, then text
             pygame.draw.rect(self.render.window, self.colour, (self.x, self.y, self.w, self.h))                 
             self.render.window.blit(self.font.render(self.text, 1, (0,0,0)), (self.x+10, self.y+10, self.w, self.h))
-            self.render.window.blit(self.font1.render(self.comment, 1, (0,0,0)), (self.x+10, self.y +30, self.w, self.h))
+            #self.render.window.blit(self.font1.render(self.comment, 1, (0,0,0)), (self.x+10, self.y +30, self.w, self.h))
+            
+            # Render commas as new lines
+            i = 0
+            for line in self.comment.split(", "):
+              self.render.window.blit(self.font1.render(line, 1, (0,0,0)), (self.x+10, self.y +30+i*10, self.w, self.h))
+              i += 1
                 
-        
         for i in range(0, len(self.children)):
             self.children[i].draw()
      
