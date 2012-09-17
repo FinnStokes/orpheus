@@ -5,16 +5,18 @@ import buildings
 import units
 from pygame.locals import *
 
-padding = 10
-menuWidth = 150
-submenuWidth = 200
+#Settings
+PADDING = 10
+MENU_WIDTH = 150
+SUBMENU_WIDTH = 200
+RESOURCE_BOX_WIDTH = 100
+RESOURCE_BOX_LINE_HEIGHT = 15
 
-pygame.font.init()
-
+#pygame.font.init()
 
 class Input:
-    myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 20)
-    myfonts = pygame.font.Font("res/fonts/8bit_nog.ttf", 16)
+    typeStyleTitle = pygame.font.Font("res/fonts/8bit_nog.ttf", 20)
+    typeStyleComment = pygame.font.Font(None, 20)
     builds = ["Factory",
               "Reclaim",
               "Fuel Extract",
@@ -36,43 +38,54 @@ class Input:
     ]
 
     def __init__(self, eventmanager, window, render):
-       self.event = eventmanager
-       self.window = window
-       self.render = render
-       self.event.register("select_planet", self.show_planet_menu)
-       self.event.register("select_planet", self.show_planet_desc)          
-       self.event.register("new_planet", self.add_planet)
-       self.event.register("mouse_up", self.mouse_up)
-       self.event.register("mouse_move", self.mouse_move)
-       self.event.register("new_turn", self.new_turn)
-       self.event.register("resourceupdate", self.update_resources)
-       self.event.register("unit_built", self.unit_built)
-       self.event.register("unit_destroyed", self.unit_destroyed)
-       self.event.register("unit_moved", self.unit_moved)
-       self.event.register("select_unit", self.select_unit)
-       self.scale = 1.0
-       self.offset = (0,0)
-       self.planets = []
-       self.over = None
-       self.selected = None
-       self.marker = images.marker.convert_alpha()
-       self.widget = None 
-       self.endturnbtn = pygame.Rect(10,10,150,40)
-       self.endturnbtn.left = self.window.get_rect().left + padding
-       self.endturnbtn.top = self.window.get_rect().bottom - self.endturnbtn.h - padding
-       self.turn = 1
-       self.turncounter = self.myfont.render("Turn 1", 1, (255,255,255), (0,0,0))
-       self.turncounterrect = self.turncounter.get_rect()
-       self.turncounterrect.top = self.window.get_rect().top
-       self.turncounterrect.centerx = self.window.get_rect().centerx
-       self.resources = self.myfont.render("", 1, (255,255,255), (0,0,0))
-       self.resourcesrect = self.resources.get_rect()
-       self.resourcesrect.bottomright = self.window.get_rect().bottomright
-       self.hresources = self.myfont.render("", 1, (255,255,255), (0,0,0))
-       self.hresourcesrect = self.hresources.get_rect()
-       self.hresourcesrect.bottomright = self.window.get_rect().bottomright
-       self.selected_unit = None
-       self.load_menu = None
+        self.event = eventmanager
+        self.window = window
+        self.render = render
+        self.event.register("select_planet", self.show_planet_menu)
+        self.event.register("select_planet", self.show_planet_desc)          
+        self.event.register("new_planet", self.add_planet)
+        self.event.register("mouse_up", self.mouse_up)
+        self.event.register("mouse_move", self.mouse_move)
+        self.event.register("new_turn", self.new_turn)
+        self.event.register("resourceupdate", self.update_resources)
+        self.event.register("unit_built", self.unit_built)
+        self.event.register("unit_destroyed", self.unit_destroyed)
+        self.event.register("unit_moved", self.unit_moved)
+        self.event.register("select_unit", self.select_unit)
+        self.scale = 1.0
+        self.offset = (0,0)
+        self.planets = []
+        self.over = None
+        self.selected = None
+        self.marker = images.marker.convert_alpha()
+        self.widget = None 
+
+        #end turn button
+        self.endturnbtn = pygame.Rect(10,10,150,40)
+        self.endturnbtn.bottomleft = self.window.get_rect().bottomleft
+        self.endturnbtn.left += PADDING
+        self.endturnbtn.top += -PADDING
+
+        #turn counter
+        self.turn = 1
+        self.turncounter = self.typeStyleTitle.render("Turn 1", 1, (255,255,255), )
+        self.turncounterrect = self.turncounter.get_rect()
+        self.turncounterrect.centerx = self.window.get_rect().centerx
+        self.turncounterrect.top = self.window.get_rect().top
+        self.turncounterrect.top += PADDING
+
+        #Resources
+        self.resourceTitle = self.typeStyleTitle.render("RAW", 1, (255,255,255), (0,0,0))
+        self.harvestedResourceTitle = self.typeStyleTitle.render("HARVESTED", 1, (255,255,255), (0,0,0))
+
+        self.resourceTitleRect = self.resourceTitle.get_rect();
+        self.harvestedResourceTitleRect = self.harvestedResourceTitle.get_rect();
+        
+        self.resourceTitleRect.width = RESOURCE_BOX_WIDTH
+        self.harvestedResourceTitleRect.width = RESOURCE_BOX_WIDTH
+
+        self.selected_unit = None
+        self.load_menu = None
 
     #draw interface
     def draw(self):
@@ -82,7 +95,7 @@ class Input:
             self.window.blit(self.marker,(int(x),int(y)))
             if self.selected_unit:
                 cost = self.selected_unit._colony.costTo(self.over.planet)
-                self.render.window.blit(self.myfont.render(str(cost*self.selected_unit.fuelFactor), 1, (255,255,255),(0,0,0)), (int(x) + self.marker.get_width() + 10, int(y) + self.marker.get_height()/2 - 10))
+                self.render.window.blit(self.typeStyleTitle.render(str(cost*self.selected_unit.fuelFactor), 1, (255,255,255),(0,0,0)), (int(x) + self.marker.get_width() + 10, int(y) + self.marker.get_height()/2 - 10))
         if self.selected:
             x = self.selected.x*self.scale + self.offset[0] - self.marker.get_width()/2
             y = self.selected.y*self.scale + self.offset[1] - self.marker.get_height()/2
@@ -92,9 +105,36 @@ class Input:
             if self.widget:
                 self.widget.update()
                 self.widget.draw()
-            self.window.blit(self.resources, self.resourcesrect)
-            if self.hresources:
-                self.window.blit(self.hresources, self.hresourcesrect)
+            
+            self.resourceTitleRect.width = RESOURCE_BOX_WIDTH
+            
+            rect = self.resourceTitleRect.copy()
+            self.window.blit(self.resourceTitle, rect)
+            
+            rect.top += RESOURCE_BOX_LINE_HEIGHT + 10
+            self.window.blit(self.resourceMetal, rect)
+
+            rect.top += RESOURCE_BOX_LINE_HEIGHT
+            self.window.blit(self.resourceFuel, rect)
+
+            rect.top += RESOURCE_BOX_LINE_HEIGHT
+            self.window.blit(self.resourceFood, rect)
+
+            if self.harvestedResourceTitle:
+              self.harvestedResourceTitleRect.width = RESOURCE_BOX_WIDTH
+              rect = self.harvestedResourceTitleRect.copy()
+              
+              self.window.blit(self.harvestedResourceTitle, rect)
+              
+              rect.top += RESOURCE_BOX_LINE_HEIGHT + 10
+              self.window.blit(self.harvestedResourceMetal, rect)
+
+              rect.top += RESOURCE_BOX_LINE_HEIGHT
+              self.window.blit(self.harvestedResourceFuel, rect)
+
+              rect.top += RESOURCE_BOX_LINE_HEIGHT
+              self.window.blit(self.harvestedResourceFood, rect)
+              
         self.window.blit(self.turncounter, self.turncounterrect)
         
         #Draw end turn button
@@ -104,11 +144,11 @@ class Input:
         textOffset = pygame.Rect(self.endturnbtn.left+10, self.endturnbtn.top+10, self.endturnbtn.width, self.endturnbtn.height)
         
         #Draw text on End turn button
-        self.render.window.blit(self.myfont.render("End Turn", 1, (0,0,0)), textOffset)
+        self.render.window.blit(self.typeStyleTitle.render("End Turn", 1, (0,0,0)), textOffset)
 
     def new_turn(self):
        self.turn += 1
-       self.turncounter = self.myfont.render("Turn "+str(self.turn), 1, (255,255,255), (0,0,0))
+       self.turncounter = self.typeStyleTitle.render("Turn "+str(self.turn), 1, (255,255,255), (0,0,0))
        self.turncounterrect = self.turncounter.get_rect()
        self.turncounterrect.top = self.window.get_rect().top
        self.turncounterrect.centerx = self.window.get_rect().centerx
@@ -164,32 +204,46 @@ class Input:
        
  
     def show_planet_desc(self, planet):
+
         if planet:
             window_rect = self.window.get_rect()
-            self.planettext = TextField(planet.description, Input.myfonts, 300)
+            self.planettext = TextField(planet.description, Input.typeStyleComment, 300)
             self.planettext.rect.top = 30
             self.planettext.rect.right = window_rect.right
-            self.planetname = Input.myfont.render(planet.name, True, (255,255,255), (0,0,0))
+            self.planetname = Input.typeStyleTitle.render(planet.name, True, (255,255,255), (0,0,0))
             self.planetnamerect = self.planetname.get_rect()
             self.planetnamerect.bottomleft = self.planettext.rect.topleft
-            self.resources = self.myfont.render("Raw: Metal = "+str(planet.metal)+", Fuel = "+str(planet.fuel)+", Food = "+str(planet.food), 1, (255,255,255), (0,0,0))
-            self.resourcesrect = self.resources.get_rect()
-            self.resourcesrect.bottomright = self.window.get_rect().bottomright
+            
+            self.resourceTitle = self.typeStyleTitle.render("RAW", 1, (255,255,255), (0,0,0))
+            self.resourceMetal = self.typeStyleComment.render("Metal: " + str(planet.metal), 1, (255,255,255), (0,0,0))
+            self.resourceFuel = self.typeStyleComment.render( "Fuel:  " + str(planet.fuel), 1, (255,255,255), (0,0,0))
+            self.resourceFood = self.typeStyleComment.render( "Food:  " + str(planet.food), 1, (255,255,255), (0,0,0))
+            
+            self.resourceTitleRect = self.resourceTitle.get_rect();
+            self.resourceTitleRect.bottomright = self.window.get_rect().bottomright;
+            self.resourceTitleRect.left += -PADDING - ((RESOURCE_BOX_WIDTH + PADDING) * 2)
+            self.resourceTitleRect.top += -PADDING - (RESOURCE_BOX_LINE_HEIGHT*4)
+
             if planet.colony:
-                self.hresources = self.myfont.render("Harvested: Metal = "+str(planet.colony.metal)+", Fuel = "+str(planet.colony.fuel)+", Food = "+str(planet.colony.food), 1, (255,255,255), (0,0,0))
-                self.hresourcesrect = self.hresources.get_rect()
-                self.hresourcesrect.bottomright = self.window.get_rect().bottomright
-                self.resourcesrect.bottomright = self.hresourcesrect.topright
+                #hresources
+                self.harvestedResourceTitle = self.typeStyleTitle.render("HARVESTED", 1, (255,255,255), (0,0,0))
+                self.harvestedResourceMetal = self.typeStyleComment.render("Metal: " + str(planet.colony.metal), 1, (255,255,255), (0,0,0))
+                self.harvestedResourceFuel = self.typeStyleComment.render( "Fuel:  " + str(planet.colony.fuel), 1, (255,255,255), (0,0,0))
+                self.harvestedResourceFood = self.typeStyleComment.render( "Food:  " + str(planet.colony.food), 1, (255,255,255), (0,0,0))
+                self.harvestedResourceTitleRect = self.harvestedResourceTitle.get_rect();
+                self.harvestedResourceTitleRect.bottomright = self.window.get_rect().bottomright;
+                self.harvestedResourceTitleRect.left += -PADDING - PADDING
+                self.harvestedResourceTitleRect.top += -PADDING - (RESOURCE_BOX_LINE_HEIGHT*4)
             else:
-                self.hresources = None
+                self.harvestedResourceTitle = None
 
     def update_resources(self,planet,resourceid,amount):
         if self.selected and self.selected.planet == planet:
-            self.resources = self.myfont.render("Raw: Metal = "+str(planet.metal)+", Fuel = "+str(planet.fuel)+", Food = "+str(planet.food), 1, (255,255,255), (0,0,0))
+            self.resources = self.typeStyleTitle.render("Raw: Metal = "+str(planet.metal)+", Fuel = "+str(planet.fuel)+", Food = "+str(planet.food), 1, (255,255,255), (0,0,0))
             self.resourcesrect = self.resources.get_rect()
             self.resourcesrect.bottomright = self.window.get_rect().bottomright
             if planet.colony:
-                self.hresources = self.myfont.render("Harvested: Metal = "+str(planet.colony.metal)+", Fuel = "+str(planet.colony.fuel)+", Food = "+str(planet.colony.food), 1, (255,255,255), (0,0,0))
+                self.hresources = self.typeStyleTitle.render("Harvested: Metal = "+str(planet.colony.metal)+", Fuel = "+str(planet.colony.fuel)+", Food = "+str(planet.colony.food), 1, (255,255,255), (0,0,0))
                 self.hresourcesrect = self.hresources.get_rect()
                 self.hresourcesrect.bottomright = self.window.get_rect().bottomright
                 self.resourcesrect.bottomright = self.hresourcesrect.topright
@@ -200,13 +254,13 @@ class Input:
     def make_planet_menu(self, planet):
         screen_width, screen_height = self.window.get_size()
 
-        self.widget = menu.Widget(padding, padding, self.event, self.render)
-        self.widget.setrect(menuWidth, screen_height-40)
-        build_mine = menu.Menu("build mine", menuWidth, 40, self.event, self.render, "MINE", ("build_mine", (planet,),), True)
-        build_menu = menu.Menu("build menu",menuWidth, 40,self.event, self.render, "BUILD", None, True)
-        unit_menu = menu.Menu("unit menu", menuWidth, 40,self.event, self.render, "UNIT",None, True)
+        self.widget = menu.Widget(PADDING, PADDING, self.event, self.render)
+        self.widget.setrect(MENU_WIDTH, screen_height-40)
+        build_mine = menu.Menu("build mine", MENU_WIDTH, 40, self.event, self.render, "MINE", ("build_mine", (planet,),), True)
+        build_menu = menu.Menu("build menu",MENU_WIDTH, 40,self.event, self.render, "BUILD", None, True)
+        unit_menu = menu.Menu("unit menu", MENU_WIDTH, 40,self.event, self.render, "UNIT",None, True)
 
-        self.transport_menu = menu.Menu("transport menu", menuWidth, 40, self.event, self.render, "TRANSPORT", None, True)      
+        self.transport_menu = menu.Menu("transport menu", MENU_WIDTH, 40, self.event, self.render, "TRANSPORT", None, True)      
    
          
         childColor = pygame.Color("grey")
@@ -214,7 +268,7 @@ class Input:
         for b in buildings.buildings():
             title = b[1].name
             comment = Input.build_comments[str(b[0])]
-            newmenu = menu.Menu(str(b[0]), submenuWidth, 40, self.event, self.render, title, ("build", (planet, b[1])),comment=comment)
+            newmenu = menu.Menu(str(b[0]), SUBMENU_WIDTH, 40, self.event, self.render, title, ("build", (planet, b[1])),comment=comment)
             newmenu.colour = childColor;
             newmenu.originalColour = childColor;
             build_menu.add(newmenu)
@@ -222,13 +276,13 @@ class Input:
         for u in units.units():
             title = str(u[1].name) #str(u[0])[:6]
             comment = Input.unit_comments[str(u[0])]
-            newmenu = menu.Menu(str(u[0]), submenuWidth, 40, self.event, self.render, title, ("build_unit",(planet, u[1])), comment=comment)
+            newmenu = menu.Menu(str(u[0]), SUBMENU_WIDTH, 40, self.event, self.render, title, ("build_unit",(planet, u[1])), comment=comment)
             newmenu.colour = childColor;
             newmenu.originalColour = childColor;
             unit_menu.add(newmenu)
 
         for u in planet.colony.units():
-            newmenu = menu.Menu(u, submenuWidth, 40, self.event, self.render, u.name, ("select_unit", (u,)))
+            newmenu = menu.Menu(u, SUBMENU_WIDTH, 40, self.event, self.render, u.name, ("select_unit", (u,)))
             newmenu.colour = childColor;
             newmenu.originalColour = childColor;
             self.transport_menu.add(newmenu)
@@ -356,18 +410,18 @@ class PlanetButton:
 ##self.buttons = []
 
 ##def screen_button(text, screen):
-###return Button(text, font = myfonts, action = lambda: shell.show_screen(screen))
+###return Button(text, font = typeStyleComment, action = lambda: shell.show_screen(screen))
 #  
 ##buttons = [
 ###screen_button("Build", shell.build_screen),
 ###screen_button("Units", shell.unit_screen),
-###Button("Colonise", font = myfonts, action = self.event.notify("colonise_planet", self.planet))
+###Button("Colonise", font = typeStyleComment, action = self.event.notify("colonise_planet", self.planet))
 ##]   
 ##buttons[0].enabled = not (self.planet.colony==None)
 ##buttons[1].enabled = not (self.planet.colony==None)##
 ##
 ##title = Label(shell.titletext)
-##title.font = myfont
+##title.font = typeStyleTitle
 ##menu = Column(buttons, align='l')
 #
 ##contents = Column([
@@ -394,14 +448,14 @@ class PlanetButton:
    
 ##title = Label(shell.titletext)
 ##
-##self.buttons.append(Button("Add Mine", font = myfonts,
+##self.buttons.append(Button("Add Mine", font = typeStyleComment,
 #########action = self.event.notify("mine_request", self.planet.colony)));
 
 ##for b in self.possbuilds:
-###self.buttons.append(Button("" + b.type, font = myfonts,
+###self.buttons.append(Button("" + b.type, font = typeStyleComment,
 #########action = self.event.notify("building_request", self.planet.colony, b.type)))
-##self.buttons.append(Button("Back",font=myfonts, action = self.back))
-##title.font = myfont
+##self.buttons.append(Button("Back",font=typeStyleComment, action = self.back))
+##title.font = typeStyleTitle
 ##menu = Column(self.buttons, align='l')
 ##contents = Column([
 ###title,
@@ -424,15 +478,15 @@ class PlanetButton:
 ##self.possunits = []  
 #
 ##def screen_button(text, screen):
-###return Button(text, font = myfont, action = lambda: shell.show_screen(screen))#   
+###return Button(text, font = typeStyleTitle, action = lambda: shell.show_screen(screen))#   
 ##title = Label(shell.titletext)
-##title.font = myfont
+##title.font = typeStyleTitle
 #  
 ##for u in self.possunits:
-###self.buttons.append(Button("" + u.type, font = myfonts,
+###self.buttons.append(Button("" + u.type, font = typeStyleComment,
 #########action = self.event.notify("unit_request", self.planet.colony, u.type)))
   
-##self.buttons.append(Button("Back",font=myfonts, action = self.back))
+##self.buttons.append(Button("Back",font=typeStyleComment, action = self.back))
 #  
 ##menu = Column(self.buttons, align='l')
 ##contents = Column([
@@ -451,7 +505,7 @@ class PlanetButton:
 ##self.planet = planet
 ##self.event = eventmanager
 ##self.buttons = []
-##self.buttons.append(Button("Back",font=myfonts, action = self.back))
+##self.buttons.append(Button("Back",font=typeStyleComment, action = self.back))
  
 
 #def ship_ready(self, ship):

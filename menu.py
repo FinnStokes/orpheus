@@ -48,11 +48,11 @@ class Widget:
         self.sh = h
 
 class Menu:
-
     pygame.font.init()
-    TEXT_OFFSET = (5, 5)
     typeStyleTitle = pygame.font.Font("res/fonts/8bit_nog.ttf", 20)
     typeStyleComment = pygame.font.Font(None, 20)
+
+    TEXT_OFFSET = (5, 5)
  
     def __init__(self, id, w, h, eventmanager, render, text, action, visible = False, comment = "", colour = pygame.Color("white")):
         self.id = id
