@@ -49,8 +49,9 @@ class Menu:
 
     pygame.font.init()
     TEXT_OFFSET = (5, 5)
-    myfont = pygame.font.Font("res/fonts/8bit_nog.ttf", 18)
-    myfonts = pygame.font.Font("res/fonts/8bit_nog.ttf", 10)
+    typeStyleTitle = pygame.font.Font("res/fonts/8bit_nog.ttf", 20)
+    typeStyleComment = pygame.font.Font(None, 20)
+    # typeStyleComment = pygame.font.Font("res/fonts/8bit_nog.ttf", 10)
  
     def __init__(self, id, w, h, eventmanager, render, text, action, visible = False, comment = "", colour = pygame.Color("white")):
         self.id = id
@@ -65,17 +66,19 @@ class Menu:
         self.text = text
         self.comment = comment
         self.TEXT_OFFSET = Menu.TEXT_OFFSET
-        self.font = Menu.myfont
-        self.font1 = Menu.myfonts
+        self.fontTitle = Menu.typeStyleTitle
+        self.fontComment = Menu.typeStyleComment
         self.colour = colour
         self.originalColour = colour
         self.highlightColour = pygame.Color(0, 255, 0, 1)
         self.event.register("mouse_up", self.mouse_up)              
         self.event.register("mouse_move", self.mouse_move)              
         
-        #Check length of comment, add new lines if necessary, increase height
+        
+        # Increase height to account for multiple line comments
         self.lineCount = self.comment.count(",")
-        self.h += self.lineCount*10;
+        self.lineHeight = 15
+        self.h += (self.lineCount * self.lineHeight) + self.lineHeight;
         
         if action == None:
             self.hasevent = False
@@ -90,15 +93,22 @@ class Menu:
     def draw(self):
         if self.visible:
         #draw box, then text
-            pygame.draw.rect(self.render.window, self.colour, (self.x, self.y, self.w, self.h))                 
-            self.render.window.blit(self.font.render(self.text, 1, (0,0,0)), (self.x+10, self.y+10, self.w, self.h))
-            #self.render.window.blit(self.font1.render(self.comment, 1, (0,0,0)), (self.x+10, self.y +30, self.w, self.h))
+            xSpacing = 10
+            ySpacing = 10
+            titleHeight = 20
             
-            # Render commas as new lines
-            i = 0
-            for line in self.comment.split(", "):
-              self.render.window.blit(self.font1.render(line, 1, (0,0,0)), (self.x+10, self.y +30+i*10, self.w, self.h))
-              i += 1
+            titleX = self.x + xSpacing
+            titleY = self.y + ySpacing
+            
+            pygame.draw.rect(self.render.window, self.colour, (self.x, self.y, self.w, self.h))                 
+            
+            # Render Menu Title
+            self.render.window.blit(self.fontTitle.render(self.text, 1, (0,0,0)), (titleX, titleY, self.w, self.h))
+            
+            # Render Menu Comment. ", " are new lines
+            for i, line in enumerate(self.comment.split(", ")):
+              commentY = titleY + titleHeight + (i * self.lineHeight)
+              self.render.window.blit(self.fontComment.render(line, 1, (0,0,0)), (titleX, commentY, self.w, self.h))
                 
         for i in range(0, len(self.children)):
             self.children[i].draw()
